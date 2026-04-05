@@ -255,6 +255,10 @@
   <div id="f-area"></div>
 </div>
 
+<div class="screen" id="s-elements" style="background:linear-gradient(180deg,#2a1a0a,#3d2b1a,#2a1a0a)">
+  <div class="game-bar"><button class="back-btn" onclick="go('map')">&#x2190; Castle</button><div class="game-title">&#x1F3F0; Element Tower</div><div class="game-gems">&#x1F48E; <span id="el-gems">0</span></div></div>
+  <div class="progress-dots" id="el-dots"></div><div id="el-area"></div>
+</div>
 <div class="screen dragon-bg" id="s-dragon">
   <div class="game-bar">
     <button class="back-btn" onclick="go('map')">&#x2190; Castle</button>
@@ -353,6 +357,7 @@ const ROOMS=[
   {id:'decoder',name:'Acrostic Decoder',icon:'\uD83D\uDD10',desc:'Crack the secret code hidden in poems!',open:true},
   {id:'counter',name:'Cinquain Counter',icon:'\uD83D\uDD22',desc:'Count syllables to verify the 2-4-6-8-2 pattern!',open:true},
   {id:'limerick',name:'Limerick Lab',icon:'\uD83E\uDD23',desc:'Pick the funniest punchline to finish the limerick!',open:true},
+  {id:'elements',name:'Element Tower',icon:'\uD83C\uDFF0',desc:'Master rhyme scheme, imagery, repetition, and theme!',open:true},
   {id:'dragon',name:'Poetry Dragon',icon:'\uD83D\uDC09',desc:'Final boss! Battle the dragon with everything you learned!',open:true},
 ];
 
@@ -369,6 +374,7 @@ function go(screen){
   else if(screen==='decoder'){document.getElementById('s-decoder').classList.add('active');initAC()}
   else if(screen==='counter'){document.getElementById('s-counter').classList.add('active');initCC()}
   else if(screen==='limerick'){document.getElementById('s-limerick').classList.add('active');initLL()}
+  else if(screen==='elements'){document.getElementById('s-elements').classList.add('active');initEL()}
   else if(screen==='dragon'){document.getElementById('s-dragon').classList.add('active');initB()}
   else if(screen==='test'){document.getElementById('s-test').classList.add('active');initTest()}
   else if(screen==='study'){document.getElementById('s-study').classList.add('active');renderStudy()}
@@ -729,6 +735,143 @@ function nextF(){
     return;
   }
   renderF();
+}
+
+// ===== ELEMENT TOWER =====
+const EL_CHALLENGES=[
+  // Imagery: tap the imagery words
+  {type:'imagery-find',title:'Find the Imagery!',instruction:'Tap every word that helps you SEE, HEAR, FEEL, SMELL, or TASTE something.',
+   text:'The crackling fire warmed her icy fingers as the sweet smell of cinnamon filled the room.',
+   answers:['crackling','warmed','icy','sweet','smell','cinnamon']},
+  // Imagery: which is imagery?
+  {type:'pick',title:'Which is imagery?',q:'Which phrase helps you picture something using your senses?',
+   a:'"The golden sunlight dripped like honey"',opts:['"The golden sunlight dripped like honey"','"The poem has five lines"','"She went to the store"','"The answer is three"']},
+  // Repetition: find the repetition
+  {type:'pick',title:'Spot the Repetition!',q:'Which poem uses repetition?',
+   a:'"Stop, stop, stop!" cried the old man. "Stop, I say!"',opts:['"Stop, stop, stop!" cried the old man. "Stop, I say!"','"The cat sat on a mat near the bat."','"Roses are red, violets are blue."','"Five syllables here, seven more syllables now."']},
+  // Repetition: what is it?
+  {type:'pick',title:'What is Repetition?',q:'Repetition in poetry means:',
+   a:'Repeating words or phrases for effect',opts:['Repeating words or phrases for effect','Using words that rhyme','Writing about the same topic twice','Counting syllables in each line']},
+  // Theme: identify the theme
+  {type:'pick',title:'Find the Theme!',q:'A poem is about a kid who falls off a bike, gets back on, and finally learns to ride. What is the theme?',
+   a:'Never give up',opts:['Bikes are dangerous','Never give up','Kids should wear helmets','Riding is fun']},
+  // Theme: what is theme?
+  {type:'pick',title:'What is Theme?',q:'The theme of a poem is:',
+   a:'The lesson or message',opts:['The title','The rhyme pattern','The lesson or message','The number of lines']},
+  // Theme: another scenario
+  {type:'pick',title:'Find the Theme!',q:'A poem describes a girl who shares her lunch with a classmate who forgot theirs. They become best friends. What is the theme?',
+   a:'Kindness brings people together',opts:['Lunch is important','Kindness brings people together','Always bring extra food','School is fun']},
+  // Rhyme scheme: label it
+  {type:'rhyme-label',title:'Label the Rhyme Scheme!',
+   lines:['The cat in the hat (___)',  'Sat on the mat (___)', 'He ate some pie (___)', 'And started to cry (___)'],
+   answers:['A','A','B','B']},
+  // Rhyme scheme: what is it?
+  {type:'pick',title:'What is a Rhyme Scheme?',q:'A rhyme scheme is:',
+   a:'The pattern of rhyming lines',opts:['The pattern of rhyming lines','How many syllables per line','The topic of the poem','How loud you read the poem']},
+  // Rhyme scheme: identify
+  {type:'pick',title:'Name That Pattern!',q:'If lines 1 & 2 rhyme, and lines 3 & 4 rhyme, the scheme is:',
+   a:'AABB',opts:['ABAB','AABB','ABBA','ABCD']},
+  // Imagery: senses
+  {type:'pick',title:'Which Sense?',q:'"The salty ocean spray stung her lips" uses which sense?',
+   a:'Taste and touch',opts:['Sight','Sound','Taste and touch','Smell']},
+  // Mix: sort element type
+  {type:'pick',title:'Name That Element!',q:'"I can do it, I can do it, I know I can do it!" - This is an example of:',
+   a:'Repetition',opts:['Imagery','Repetition','Theme','Rhyme Scheme']},
+  // Imagery: another find
+  {type:'imagery-find',title:'Find the Imagery!',instruction:'Tap words that paint a picture!',
+   text:'The velvety petals of the crimson rose glistened with sparkling morning dew under the pale pink sky.',
+   answers:['velvety','crimson','glistened','sparkling','morning','dew','pale','pink']},
+  // Rhyme scheme: ABAB
+  {type:'rhyme-label',title:'Label the Rhyme Scheme!',
+   lines:['I saw a bird up in a tree (___)', 'It sang a song so sweet (___)', 'It looked right down at me (___)', 'Then flew off down the street (___)'],
+   answers:['A','B','A','B']},
+];
+
+function initEL(){G.el={round:0,gems:0};document.getElementById('el-gems').textContent='0';renderEL()}
+function renderEL(){
+  const el=G.el,ch=EL_CHALLENGES[el.round%EL_CHALLENGES.length];
+  const dots=document.getElementById('el-dots');dots.innerHTML='';
+  const total=Math.min(EL_CHALLENGES.length,12);
+  for(let i=0;i<total;i++){const d=document.createElement('span');d.className='dot'+(i<el.round?' done':'')+(i===el.round?' current':'');dots.appendChild(d)}
+
+  const area=document.getElementById('el-area');
+
+  if(ch.type==='pick'){
+    const opts=ch.opts.sort(()=>Math.random()-.5);
+    area.innerHTML=`<div class="game-card"><h3>&#x1F3F0; ${ch.title}</h3><p style="font-weight:600;margin-bottom:10px">${ch.q}</p>
+      <div class="mic-opts">${opts.map(o=>`<div class="mic-opt" onclick="elPick(this,'${o.replace(/'/g,"\\'")}')">${o}</div>`).join('')}</div></div>
+      <div class="feedback" id="el-fb"></div><button class="next-btn" id="el-next" onclick="nextEL()">Next Challenge &#x2192;</button>`;
+  }
+  else if(ch.type==='imagery-find'){
+    const words=ch.text.split(/\s+/);
+    const wordHtml=words.map(w=>{
+      const clean=w.toLowerCase().replace(/[^a-z]/g,'');
+      const isImg=ch.answers.includes(clean);
+      return `<span class="passage-word" data-img="${isImg?1:0}" onclick="this.classList.toggle('selected')">${w} </span>`;
+    }).join('');
+    area.innerHTML=`<div class="game-card"><h3>&#x1F3F0; ${ch.title}</h3><p style="font-size:.82em;opacity:.6;margin-bottom:8px">${ch.instruction}</p>
+      <div class="passage">${wordHtml}</div></div>
+      <button class="check-btn" onclick="checkELImg()">&#x2728; Check!</button>
+      <div class="feedback" id="el-fb"></div><button class="next-btn" id="el-next" onclick="nextEL()">Next Challenge &#x2192;</button>`;
+  }
+  else if(ch.type==='rhyme-label'){
+    const linesHtml=ch.lines.map((l,i)=>`<div style="display:flex;align-items:center;gap:8px;margin:6px 0">
+      <span style="flex:1">${l}</span>
+      <select id="rl${i}" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px;font-family:'Quicksand',sans-serif;min-height:40px">
+        <option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option>
+      </select></div>`).join('');
+    area.innerHTML=`<div class="game-card"><h3>&#x1F3F0; ${ch.title}</h3><p style="font-size:.82em;opacity:.6;margin-bottom:8px">Fill in the rhyme scheme letter for each line!</p>
+      ${linesHtml}</div>
+      <button class="check-btn" onclick="checkELRhyme()">&#x2728; Check!</button>
+      <div class="feedback" id="el-fb"></div><button class="next-btn" id="el-next" onclick="nextEL()">Next Challenge &#x2192;</button>`;
+  }
+}
+
+function elPick(el,ans){
+  const ch=EL_CHALLENGES[G.el.round%EL_CHALLENGES.length],fb=document.getElementById('el-fb');
+  document.querySelectorAll('.mic-opt').forEach(o=>o.classList.add('dis'));
+  if(ans===ch.a){el.classList.add('right');G.el.gems+=3;G.gems+=3;save();document.getElementById('el-gems').textContent=G.el.gems;
+    fb.className='feedback show ok';fb.innerHTML='<div>&#x2705; Correct! +3 gems!</div>'}
+  else{el.classList.add('nope');document.querySelectorAll('.mic-opt').forEach(o=>{if(o.textContent===ch.a)o.classList.add('show-right')});
+    fb.className='feedback show no';fb.innerHTML=`<div>The answer is: ${ch.a}</div>`}
+  document.getElementById('el-next').classList.add('show');
+}
+
+function checkELImg(){
+  const ch=EL_CHALLENGES[G.el.round%EL_CHALLENGES.length],fb=document.getElementById('el-fb');
+  let correct=0,wrong=0,missed=0;
+  document.querySelectorAll('.passage-word').forEach(el=>{
+    const isImg=el.dataset.img==='1',isSel=el.classList.contains('selected');
+    el.classList.remove('selected');
+    if(isImg&&isSel){el.classList.add('correct');correct++}
+    else if(!isImg&&isSel){el.classList.add('wrong');wrong++}
+    else if(isImg){missed++;setTimeout(()=>el.classList.add('correct'),500)}
+  });
+  const earned=correct>=ch.answers.length/2?3:1;
+  G.el.gems+=earned;G.gems+=earned;save();document.getElementById('el-gems').textContent=G.el.gems;
+  fb.className=correct>=ch.answers.length/2?'feedback show ok':'feedback show no';
+  fb.innerHTML=`<div>${correct} found${missed>0?', '+missed+' missed':''}${wrong>0?', '+wrong+' wrong':''}. +${earned} gems!</div>`;
+  document.getElementById('el-next').classList.add('show');
+}
+
+function checkELRhyme(){
+  const ch=EL_CHALLENGES[G.el.round%EL_CHALLENGES.length],fb=document.getElementById('el-fb');
+  const guesses=ch.answers.map((_,i)=>document.getElementById('rl'+i).value);
+  if(guesses.some(g=>!g)){fb.className='feedback show no';fb.innerHTML='<div>Fill in all the letters!</div>';setTimeout(()=>fb.className='feedback',1500);return}
+  // Normalize pattern
+  const norm=arr=>{const m={};let n=0;return arr.map(c=>{if(!(c in m))m[c]=n++;return m[c]}).join(',')};
+  if(norm(guesses)===norm(ch.answers)){
+    G.el.gems+=4;G.gems+=4;save();document.getElementById('el-gems').textContent=G.el.gems;
+    fb.className='feedback show ok';fb.innerHTML=`<div>&#x2705; ${ch.answers.join('')}! +4 gems!</div>`}
+  else{fb.className='feedback show no';fb.innerHTML=`<div>Not quite! The pattern is ${ch.answers.join('')}.</div>`}
+  document.getElementById('el-next').classList.add('show');
+}
+
+function nextEL(){
+  G.el.round++;document.getElementById('el-next').classList.remove('show');document.getElementById('el-fb').className='feedback';
+  const total=Math.min(EL_CHALLENGES.length,12);
+  if(G.el.round>=total){G.rooms.elements={done:true};save();document.getElementById('el-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F3F0;</div><h3>Element Tower Complete!</h3><p>&#x1F48E; ${G.el.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;return}
+  renderEL();
 }
 
 // ===== POETRY DRAGON =====
