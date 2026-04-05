@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Victoria's Poetry Quest</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+    h1 {
+      text-align: center;
+      color: white;
+      font-size: 2em;
+      margin: 20px 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    .subtitle {
+      text-align: center;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 24px;
+      font-size: 1.1em;
+    }
+    .score-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 12px 20px;
+      margin-bottom: 20px;
+      color: white;
+      font-weight: 600;
+    }
+    .stars { font-size: 1.4em; letter-spacing: 2px; }
+    .streak { font-size: 0.9em; opacity: 0.9; }
+    .question-num {
+      font-size: 0.85em;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .question {
+      font-size: 1.2em;
+      font-weight: 600;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+    .poem-example {
+      background: #f8f5ff;
+      border-left: 4px solid #764ba2;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-style: italic;
+      line-height: 1.6;
+      white-space: pre-line;
+      font-size: 0.95em;
+    }
+    .hint {
+      font-size: 0.85em;
+      color: #888;
+      margin-bottom: 16px;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .option {
+      background: #f0edff;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .option:hover { background: #e0dbff; transform: scale(1.02); }
+    .option:active { transform: scale(0.98); }
+    .option.correct {
+      background: #d4edda;
+      border-color: #28a745;
+      animation: pop 0.3s ease;
+    }
+    .option.wrong {
+      background: #f8d7da;
+      border-color: #dc3545;
+      animation: shake 0.4s ease;
+    }
+    .option.disabled { pointer-events: none; opacity: 0.7; }
+    .option.show-correct { background: #d4edda; border-color: #28a745; opacity: 1 !important; }
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    .feedback {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 500;
+      display: none;
+      line-height: 1.5;
+    }
+    .feedback.correct { display: block; background: #d4edda; color: #155724; }
+    .feedback.wrong { display: block; background: #f8d7da; color: #721c24; }
+    .next-btn {
+      display: none;
+      width: 100%;
+      padding: 14px;
+      margin-top: 14px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .next-btn:hover { transform: scale(1.02); }
+    .next-btn.show { display: block; }
+    .mode-select {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .mode-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 18px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .mode-btn:hover { transform: scale(1.03); }
+    .mode-btn small { display: block; font-weight: 400; opacity: 0.85; margin-top: 4px; font-size: 0.8em; }
+    .results {
+      text-align: center;
+    }
+    .results h2 { font-size: 1.6em; margin-bottom: 10px; }
+    .results .big-stars { font-size: 3em; margin: 16px 0; }
+    .results .score-text { font-size: 1.2em; margin-bottom: 8px; }
+    .results .message { font-size: 1em; color: #666; margin-bottom: 20px; }
+    .study-card {
+      background: #f8f5ff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    .study-card h3 { color: #764ba2; margin-bottom: 6px; }
+    .study-card p { font-size: 0.9em; line-height: 1.5; }
+    .study-card .example {
+      font-style: italic;
+      margin-top: 6px;
+      padding: 8px;
+      background: white;
+      border-radius: 6px;
+      font-size: 0.85em;
+      white-space: pre-line;
+    }
+    .progress-bar {
+      height: 6px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 3px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #ffd700;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    .badge {
+      display: inline-block;
+      background: #ffd700;
+      color: #333;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.8em;
+      font-weight: 600;
+      margin: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Victoria's Poetry Quest</h1>
+    <div id="app"></div>
+  </div>
+
+<script>
+const POETRY_TYPES = {
+  acrostic: {
+    name: "Acrostic",
+    rules: "The first letters of each line spell out a word or phrase.",
+    example: "An acrostic poem\nCan be about anything\nReally\nOf course, some people like to\nStart each line as a sentence,\nThough\nI prefer words into a\nCreation that is more freeform.",
+    syllables: null,
+    lines: null,
+    rhyme: null,
+  },
+  haiku: {
+    name: "Haiku",
+    rules: "An unrhymed three-line poem based on a traditional Japanese form. Line 1: 5 syllables, Line 2: 7 syllables, Line 3: 5 syllables.",
+    example: "An old silent pond\nA frog jumps into the pond\nSplash! Silence again",
+    syllables: "5-7-5",
+    lines: 3,
+    rhyme: "none",
+  },
+  diamante: {
+    name: "Diamante",
+    rules: "Seven lines long shaped like a diamond. Line 1: noun, Line 2: two adjectives, Line 3: three verbs, Line 4: four nouns, Line 5: three verbs, Line 6: two adjectives, Line 7: noun (synonym or antonym of line 1).",
+    example: "Day\nBright, Warm\nShining, Glowing, Radiating\nDay, Light, Energy, Hope\nSetting, Dimming, Fading\nCalm, Peaceful\nNight",
+    syllables: null,
+    lines: 7,
+    rhyme: "none",
+  },
+  cinquain: {
+    name: "Cinquain",
+    rules: "Five lines long. Syllable pattern: 2, 4, 6, 8, 2. Tells a story. Does not need to rhyme but can.",
+    example: "Nightfall\nShadows creeping\nSilently darkness falls\nThe moon rises up to light the\nNew night",
+    syllables: "2-4-6-8-2",
+    lines: 5,
+    rhyme: "optional",
+  },
+  limerick: {
+    name: "Limerick",
+    rules: "A humorous poem with exactly 5 lines and 13 beats. Follows the AABBA rhyme scheme. Lines 1, 2, 5 have 7-9 syllables. Lines 3, 4 have 5-7 syllables.",
+    example: "A lim'rick's not hard to define\nBut it needs to do more than just rhyme\nIt's the meter that matters\nThe pitters and patters\nIf not, you're just wasting my time.",
+    syllables: "7-9 / 7-9 / 5-7 / 5-7 / 7-9",
+    lines: 5,
+    rhyme: "AABBA",
+  },
+  couplet: {
+    name: "Couplet",
+    rules: "A pair of lines that rhyme. Can be a complete poem or part of a longer one.",
+    example: "The artist stirred some blue and green\nTo paint an underwater scene.",
+    syllables: null,
+    lines: 2,
+    rhyme: "AA",
+  },
+  sonnet: {
+    name: "Sonnet",
+    rules: "Fourteen lines long with 10 syllables each. Three stanzas of four lines (quatrains) with ABAB rhyme, followed by a final couplet with AA rhyme. First line states the theme, final couplet provides the conclusion.",
+    example: null,
+    syllables: "10 per line",
+    lines: 14,
+    rhyme: "ABAB ABAB ABAB AA",
+  },
+  freeverse: {
+    name: "Free Verse",
+    rules: "No rules about rhyme, meter, or line count. The poet works hard to create something beautiful and meaningful without specific guidelines.",
+    example: "Up. Up.\nClick, click.\nWind blows\nsharp in my ears.\nMy heart jumps. Skips.\nIt's up. It's up higher.",
+    syllables: null,
+    lines: null,
+    rhyme: "none",
+  },
+};
+
+const POETRY_ELEMENTS = {
+  rhyme_scheme: {
+    name: "Rhyme Scheme",
+    definition: "The pattern of rhyming lines in a poem. Common patterns include AABB (first two lines rhyme, next two rhyme) and ABAB (every other line rhymes).",
+    example: "Roses are red, (A)\nViolets are blue, (B)\nSugar is sweet, (A)\nAnd so are you. (B)\n\nThis is ABAB because lines 1 & 3 rhyme, and lines 2 & 4 rhyme.",
+  },
+  imagery: {
+    name: "Imagery",
+    definition: "Words that help you picture something in your mind. They paint a picture using your senses - what you see, hear, feel, smell, or taste.",
+    example: "\"Feathered wings\" helps you imagine soft, delicate bird wings.\n\"The crackling fire warmed her icy fingers\" - you can feel the cold and hear the fire.",
+  },
+  repetition: {
+    name: "Repetition",
+    definition: "Repeating words or phrases in a poem for effect. It can make ideas stronger, create rhythm, or make something memorable.",
+    example: "\"I have a dream\" (repeated by MLK Jr.)\n\"Stop, stop, stop!\" - repeating the word makes it more urgent.",
+  },
+  theme: {
+    name: "Theme",
+    definition: "The lesson or message of the poem. It's the big idea the poet wants you to understand. For example: \"Nobody is perfect.\"",
+    example: "A poem about a kid who makes mistakes but keeps trying might have the theme: \"Never give up\" or \"It's okay to fail.\"",
+  },
+};
+
+const ELEMENT_NAMES = Object.values(POETRY_ELEMENTS).map(e => e.name);
+
+const TYPES = Object.keys(POETRY_TYPES);
+const TYPE_NAMES = TYPES.map(t => POETRY_TYPES[t].name);
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickRandom(arr, exclude) {
+  const filtered = arr.filter(x => x !== exclude);
+  return filtered[Math.floor(Math.random() * filtered.length)];
+}
+
+function generateQuestions(mode) {
+  const questions = [];
+
+  if (mode === "identify") {
+    // Show a description/example, identify the type
+    for (const key of shuffle(TYPES)) {
+      const t = POETRY_TYPES[key];
+      const q = { answer: t.name, options: [] };
+
+      // Vary the question format
+      const formats = [];
+      if (t.example) formats.push("example");
+      if (t.rules) formats.push("rules");
+      if (t.lines) formats.push("lines");
+      if (t.rhyme && t.rhyme !== "none") formats.push("rhyme");
+
+      const fmt = formats[Math.floor(Math.random() * formats.length)];
+
+      if (fmt === "example" && t.example) {
+        q.question = "What type of poem is this?";
+        q.poem = t.example;
+      } else if (fmt === "rhyme" && t.rhyme) {
+        q.question = `Which poem type uses the ${t.rhyme} rhyme scheme?`;
+      } else if (fmt === "lines" && t.lines) {
+        q.question = `Which poem type has exactly ${t.lines} lines?`;
+        if (t.lines === 5) q.hint = "There are two 5-line types - look for other clues!";
+      } else {
+        q.question = "Which poem type matches this description?";
+        q.hint = t.rules;
+      }
+
+      // Build options: correct + 3 wrong
+      q.options = [t.name];
+      while (q.options.length < 4) {
+        const wrong = pickRandom(TYPE_NAMES, t.name);
+        if (!q.options.includes(wrong)) q.options.push(wrong);
+      }
+      q.options = shuffle(q.options);
+      q.explanation = t.rules;
+      questions.push(q);
+    }
+  } else if (mode === "rules") {
+    // Test specific rules knowledge
+    const ruleQs = [
+      { q: "How many syllables does the first line of a haiku have?", a: "5", opts: ["3", "5", "7", "10"] },
+      { q: "How many syllables does the second line of a haiku have?", a: "7", opts: ["5", "7", "9", "3"] },
+      { q: "What rhyme scheme does a limerick follow?", a: "AABBA", opts: ["ABAB", "AABBA", "ABBA", "AABB"] },
+      { q: "How many lines does a sonnet have?", a: "14", opts: ["10", "12", "14", "16"] },
+      { q: "In a diamante, what type of word goes on line 1?", a: "Noun", opts: ["Verb", "Adjective", "Noun", "Adverb"] },
+      { q: "In a diamante, what type of words go on lines 2 and 6?", a: "Adjectives", opts: ["Nouns", "Verbs", "Adjectives", "Adverbs"] },
+      { q: "In a diamante, what type of words go on lines 3 and 5?", a: "Verbs", opts: ["Nouns", "Verbs", "Adjectives", "Pronouns"] },
+      { q: "How many lines does a cinquain have?", a: "5", opts: ["3", "4", "5", "7"] },
+      { q: "What is the syllable pattern of a cinquain?", a: "2-4-6-8-2", opts: ["5-7-5", "2-4-6-8-2", "1-2-3-4-5", "3-5-7-5-3"] },
+      { q: "In an acrostic poem, what do the first letters of each line do?", a: "Spell a word", opts: ["Rhyme", "Spell a word", "Count syllables", "Repeat"] },
+      { q: "A couplet is a pair of lines that ___.", a: "Rhyme", opts: ["Rhyme", "Have 5 syllables", "Don't rhyme", "Are questions"] },
+      { q: "How many syllables per line does a sonnet have?", a: "10", opts: ["5", "7", "10", "14"] },
+      { q: "What rhyme scheme do the stanzas (quatrains) of a sonnet use?", a: "ABAB", opts: ["AABB", "ABAB", "AABBA", "ABBA"] },
+      { q: "How many beats (total) does a limerick have?", a: "13", opts: ["10", "13", "15", "17"] },
+      { q: "Lines 1, 2, and 5 of a limerick usually have how many syllables?", a: "7-9", opts: ["3-5", "5-7", "7-9", "10-12"] },
+      { q: "Which poetry type has NO rules about rhyme or meter?", a: "Free Verse", opts: ["Haiku", "Free Verse", "Sonnet", "Limerick"] },
+      { q: "In a diamante, what is the last word?", a: "A synonym or antonym of the first word", opts: ["The same word as line 1", "A verb", "A synonym or antonym of the first word", "A rhyming word"] },
+      { q: "The final two lines of a sonnet are called a ___.", a: "Couplet", opts: ["Stanza", "Couplet", "Diamante", "Haiku"] },
+      { q: "Which type of poem is always humorous?", a: "Limerick", opts: ["Haiku", "Sonnet", "Limerick", "Free Verse"] },
+      { q: "A haiku is based on a traditional ___ poetic form.", a: "Japanese", opts: ["French", "Japanese", "English", "Italian"] },
+    ];
+
+    for (const rq of shuffle(ruleQs)) {
+      questions.push({
+        question: rq.q,
+        answer: rq.a,
+        options: shuffle(rq.opts),
+        explanation: null,
+      });
+    }
+  } else if (mode === "elements") {
+    const elemQs = [
+      { q: "What is a rhyme scheme?", a: "The pattern of rhyming lines", opts: ["The pattern of rhyming lines", "The number of syllables", "The topic of the poem", "The rhythm of the poem"] },
+      { q: "AABB means:", a: "Lines 1 & 2 rhyme, lines 3 & 4 rhyme", opts: ["Lines 1 & 2 rhyme, lines 3 & 4 rhyme", "Every other line rhymes", "No lines rhyme", "All lines rhyme with each other"] },
+      { q: "ABAB means:", a: "Every other line rhymes", opts: ["Lines 1 & 2 rhyme together", "Every other line rhymes", "Only the last two lines rhyme", "Nothing rhymes"] },
+      { q: "What is imagery?", a: "Words that help you picture something", opts: ["Words that rhyme", "Words that help you picture something", "Words that repeat", "The title of the poem"] },
+      { q: "\"Feathered wings\" is an example of:", a: "Imagery", opts: ["Rhyme Scheme", "Imagery", "Repetition", "Theme"] },
+      { q: "\"The golden sun melted into the purple horizon\" is an example of:", a: "Imagery", opts: ["Repetition", "Theme", "Imagery", "Rhyme Scheme"] },
+      { q: "What is repetition in poetry?", a: "Repeating words or phrases", opts: ["Using big words", "Repeating words or phrases", "Writing about nature", "Making lines rhyme"] },
+      { q: "\"Stop, stop, stop!\" is an example of:", a: "Repetition", opts: ["Imagery", "Theme", "Rhyme Scheme", "Repetition"] },
+      { q: "What is the theme of a poem?", a: "The lesson or message", opts: ["The title", "The rhyme pattern", "The lesson or message", "The number of lines"] },
+      { q: "\"Nobody is perfect\" is an example of a poem's:", a: "Theme", opts: ["Rhyme Scheme", "Imagery", "Repetition", "Theme"] },
+      { q: "A poem about a kid who keeps trying after failing might have the theme:", a: "Never give up", opts: ["Cats are cool", "Never give up", "AABB", "Feathered wings"] },
+      { q: "Which element makes you use your senses (see, hear, feel, smell, taste)?", a: "Imagery", opts: ["Theme", "Repetition", "Rhyme Scheme", "Imagery"] },
+      { q: "Which element gives the poem rhythm by saying things more than once?", a: "Repetition", opts: ["Imagery", "Repetition", "Theme", "Rhyme Scheme"] },
+      { q: "In AABB, which lines rhyme with each other?", a: "1 with 2, and 3 with 4", opts: ["1 with 3, and 2 with 4", "1 with 2, and 3 with 4", "1 with 4, and 2 with 3", "None of them"] },
+      { q: "\"The icy wind bit her cheeks\" uses imagery for which sense?", a: "Touch (feeling)", opts: ["Sight", "Sound", "Touch (feeling)", "Taste"] },
+      { q: "\"I can see it, I can see it, I can see it now!\" uses:", a: "Repetition", opts: ["Imagery", "Repetition", "Theme", "Rhyme Scheme"] },
+    ];
+
+    for (const eq of shuffle(elemQs).slice(0, 10)) {
+      questions.push({
+        question: eq.q,
+        answer: eq.a,
+        options: shuffle(eq.opts),
+        explanation: null,
+      });
+    }
+  } else if (mode === "match") {
+    // Match poem to its type - show short examples
+    const examples = [
+      { poem: "An old silent pond\nA frog jumps into the pond\nSplash! Silence again", answer: "Haiku", explain: "Three lines with 5-7-5 syllables." },
+      { poem: "The artist stirred some blue and green\nTo paint an underwater scene.", answer: "Couplet", explain: "Two lines that rhyme." },
+      { poem: "Day\nBright, Warm\nShining, Glowing, Radiating\nDay, Light, Energy, Hope\nSetting, Dimming, Fading\nCalm, Peaceful\nNight", answer: "Diamante", explain: "Seven lines in a diamond shape with specific word types." },
+      { poem: "A lim'rick's not hard to define\nBut it needs to do more than just rhyme\nIt's the meter that matters\nThe pitters and patters\nIf not, you're just wasting my time.", answer: "Limerick", explain: "Five humorous lines with AABBA rhyme." },
+      { poem: "Up. Up.\nClick, click.\nWind blows\nsharp in my ears.\nMy heart jumps. Skips.", answer: "Free Verse", explain: "No rules about rhyme or meter." },
+      { poem: "Sunlight\nGolden and warm\nDancing across the meadow\nButterflies flutter their painted wings\nSpringtime", answer: "Cinquain", explain: "Five lines with 2-4-6-8-2 syllables." },
+      { poem: "Joyful\nAlways smiling\nCaring for everyone\nKind to all she meets\nOn a mission to spread\nRadiant happiness to\nInspire the world\nAnytime, anywhere", answer: "Acrostic", explain: "First letters spell out a word - JCKORDIA... wait, this spells JACKORIN... Actually, the first letters spell something!" },
+    ];
+
+    for (const ex of shuffle(examples)) {
+      const q = {
+        question: "What type of poem is this?",
+        poem: ex.poem,
+        answer: ex.answer,
+        options: [ex.answer],
+        explanation: ex.explain,
+      };
+      while (q.options.length < 4) {
+        const wrong = pickRandom(TYPE_NAMES, ex.answer);
+        if (!q.options.includes(wrong)) q.options.push(wrong);
+      }
+      q.options = shuffle(q.options);
+      questions.push(q);
+    }
+  }
+
+  return questions.slice(0, 10);
+}
+
+// Game state
+let state = {
+  screen: "menu",
+  mode: null,
+  questions: [],
+  current: 0,
+  score: 0,
+  streak: 0,
+  bestStreak: 0,
+  answered: false,
+};
+
+function render() {
+  const app = document.getElementById("app");
+
+  if (state.screen === "menu") {
+    app.innerHTML = `
+      <div class="subtitle">Learn your poetry types!</div>
+      <div class="card">
+        <div class="mode-select">
+          <button class="mode-btn" onclick="startGame('identify')">
+            Name That Poem!
+            <small>Read a description and pick the poetry type</small>
+          </button>
+          <button class="mode-btn" onclick="startGame('rules')">
+            Rules Quiz
+            <small>Test your knowledge of syllables, rhymes, and rules</small>
+          </button>
+          <button class="mode-btn" onclick="startGame('match')">
+            Match the Example
+            <small>Read a poem and figure out what type it is</small>
+          </button>
+          <button class="mode-btn" onclick="startGame('elements')" style="background: linear-gradient(135deg, #e67e22, #e74c3c)">
+            Poetry Elements
+            <small>Rhyme scheme, imagery, repetition, and theme</small>
+          </button>
+          <button class="mode-btn" onclick="showStudy()" style="background: linear-gradient(135deg, #28a745, #20c997)">
+            Study Guide
+            <small>Review all 8 poetry types before you play</small>
+          </button>
+        </div>
+      </div>
+    `;
+  } else if (state.screen === "study") {
+    let cards = '<h3 style="margin-bottom:8px;color:#764ba2">Poetry Types</h3>';
+    for (const key of TYPES) {
+      const t = POETRY_TYPES[key];
+      cards += `
+        <div class="study-card">
+          <h3>${t.name}</h3>
+          <p>${t.rules}</p>
+          ${t.lines ? `<p><strong>Lines:</strong> ${t.lines}</p>` : ""}
+          ${t.syllables ? `<p><strong>Syllables:</strong> ${t.syllables}</p>` : ""}
+          ${t.rhyme && t.rhyme !== "none" ? `<p><strong>Rhyme:</strong> ${t.rhyme}</p>` : ""}
+          ${t.example ? `<div class="example">${t.example}</div>` : ""}
+        </div>
+      `;
+    }
+    cards += '<h3 style="margin:16px 0 8px;color:#e67e22">Poetry Elements</h3>';
+    for (const key of Object.keys(POETRY_ELEMENTS)) {
+      const e = POETRY_ELEMENTS[key];
+      cards += `
+        <div class="study-card" style="border-left:3px solid #e67e22">
+          <h3 style="color:#e67e22">${e.name}</h3>
+          <p>${e.definition}</p>
+          <div class="example">${e.example}</div>
+        </div>
+      `;
+    }
+    app.innerHTML = `
+      <div class="subtitle">Study all 8 poetry types</div>
+      <div class="card">${cards}</div>
+      <button class="next-btn show" onclick="state.screen='menu'; render()">Back to Menu</button>
+    `;
+  } else if (state.screen === "game") {
+    const q = state.questions[state.current];
+    const progress = ((state.current) / state.questions.length) * 100;
+    const starStr = Array(state.score).fill("\u2B50").join("");
+
+    let optionsHtml = "";
+    for (const opt of q.options) {
+      optionsHtml += `<button class="option" onclick="answer('${opt.replace(/'/g, "\\'")}')">${opt}</button>`;
+    }
+
+    app.innerHTML = `
+      <div class="score-bar">
+        <div class="stars">${starStr || "No stars yet"}</div>
+        <div class="streak">${state.streak > 1 ? state.streak + "x streak!" : ""}</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+      <div class="card">
+        <div class="question-num">Question ${state.current + 1} of ${state.questions.length}</div>
+        <div class="question">${q.question}</div>
+        ${q.poem ? `<div class="poem-example">${q.poem}</div>` : ""}
+        ${q.hint ? `<div class="hint">${q.hint}</div>` : ""}
+        <div class="options">${optionsHtml}</div>
+        <div class="feedback" id="feedback"></div>
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
+      </div>
+    `;
+  } else if (state.screen === "results") {
+    const pct = Math.round((state.score / state.questions.length) * 100);
+    let msg, emoji;
+    if (pct === 100) { msg = "PERFECT SCORE! You're a poetry master, Victoria!"; emoji = "\uD83C\uDF1F\uD83D\uDC51\uD83C\uDF1F"; }
+    else if (pct >= 80) { msg = "Amazing job, Victoria! You really know your poetry!"; emoji = "\uD83C\uDF1F\u2B50\uD83C\uDF1F"; }
+    else if (pct >= 60) { msg = "Great work! Keep practicing and you'll be a pro!"; emoji = "\u2B50\u2B50"; }
+    else if (pct >= 40) { msg = "Good try! Check the study guide and try again!"; emoji = "\u2B50"; }
+    else { msg = "Keep learning! The study guide will help a lot!"; emoji = "\uD83D\uDCDA"; }
+
+    const badges = [];
+    if (pct === 100) badges.push("\uD83C\uDFC6 Perfect Score");
+    if (state.bestStreak >= 5) badges.push("\uD83D\uDD25 5+ Streak");
+    if (state.bestStreak >= 3) badges.push("\u26A1 Hot Streak");
+
+    app.innerHTML = `
+      <div class="card results">
+        <div class="big-stars">${emoji}</div>
+        <h2>Quest Complete!</h2>
+        <div class="score-text">${state.score} out of ${state.questions.length} correct (${pct}%)</div>
+        ${state.bestStreak >= 3 ? `<div class="score-text">Best streak: ${state.bestStreak}x</div>` : ""}
+        ${badges.length ? `<div style="margin:10px 0">${badges.map(b => `<span class="badge">${b}</span>`).join(" ")}</div>` : ""}
+        <div class="message">${msg}</div>
+        <button class="mode-btn" onclick="state.screen='menu'; render()">Play Again</button>
+      </div>
+    `;
+  }
+}
+
+function startGame(mode) {
+  state = {
+    screen: "game",
+    mode,
+    questions: generateQuestions(mode),
+    current: 0,
+    score: 0,
+    streak: 0,
+    bestStreak: 0,
+    answered: false,
+  };
+  render();
+}
+
+function showStudy() {
+  state.screen = "study";
+  render();
+}
+
+function answer(selected) {
+  if (state.answered) return;
+  state.answered = true;
+
+  const q = state.questions[state.current];
+  const correct = selected === q.answer;
+  const feedback = document.getElementById("feedback");
+  const nextBtn = document.getElementById("next-btn");
+  const options = document.querySelectorAll(".option");
+
+  if (correct) {
+    state.score++;
+    state.streak++;
+    if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+    feedback.className = "feedback correct";
+    feedback.innerHTML = `\u2705 Correct!${state.streak > 1 ? ` <strong>${state.streak}x streak!</strong>` : ""}${q.explanation ? `<br><small>${q.explanation}</small>` : ""}`;
+  } else {
+    state.streak = 0;
+    feedback.className = "feedback wrong";
+    feedback.innerHTML = `\u274C The answer is <strong>${q.answer}</strong>.${q.explanation ? `<br><small>${q.explanation}</small>` : ""}`;
+  }
+
+  options.forEach(opt => {
+    opt.classList.add("disabled");
+    if (opt.textContent === q.answer) opt.classList.add(correct ? "correct" : "show-correct");
+    if (opt.textContent === selected && !correct) opt.classList.add("wrong");
+  });
+
+  nextBtn.classList.add("show");
+  nextBtn.textContent = state.current < state.questions.length - 1 ? "Next Question" : "See Results!";
+}
+
+function nextQuestion() {
+  state.current++;
+  state.answered = false;
+  if (state.current >= state.questions.length) {
+    state.screen = "results";
+  } else {
+    state.screen = "game";
+  }
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

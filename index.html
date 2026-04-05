@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Victoria's Learning Castle</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #fce4ec 0%, #f8bbd0 30%, #e1bee7 60%, #ce93d8 100%);
+      overflow-x: hidden;
+    }
+
+    /* Floating decorations */
+    .sparkles {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .sparkle {
+      position: absolute;
+      font-size: 20px;
+      animation: float 6s ease-in-out infinite;
+      opacity: 0.6;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+      50% { transform: translateY(-30px) rotate(15deg); opacity: 1; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 30px 0 10px;
+    }
+    .crown { font-size: 3em; }
+    h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: 2.2em;
+      color: #6a1b9a;
+      text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+      margin: 10px 0;
+    }
+    .school-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #7b1fa2, #4a148c);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin: 8px 0;
+    }
+    .school-badge span {
+      opacity: 0.85;
+      font-weight: 400;
+    }
+
+    .subtitle {
+      color: #8e24aa;
+      font-size: 1em;
+      margin-bottom: 24px;
+    }
+
+    /* Grade sections */
+    .grade-section {
+      margin-bottom: 24px;
+    }
+    .grade-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .grade-header h2 {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 1.3em;
+      color: #6a1b9a;
+    }
+    .grade-icon {
+      font-size: 1.4em;
+    }
+    .grade-line {
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, #ce93d8, transparent);
+      border-radius: 1px;
+    }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 20px rgba(106,27,154,0.12);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+      border: 2px solid transparent;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(106,27,154,0.2);
+      border-color: #ce93d8;
+    }
+    .card:active { transform: translateY(0); }
+
+    .card-icon {
+      font-size: 2.2em;
+      flex-shrink: 0;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+      border-radius: 14px;
+    }
+    .card-body h3 {
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #4a148c;
+      margin-bottom: 4px;
+    }
+    .card-body p {
+      font-size: 0.85em;
+      color: #888;
+      line-height: 1.4;
+    }
+    .card-arrow {
+      margin-left: auto;
+      font-size: 1.2em;
+      color: #ce93d8;
+      flex-shrink: 0;
+    }
+
+    .coming-soon {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .coming-soon:hover {
+      transform: none;
+      box-shadow: 0 4px 20px rgba(106,27,154,0.12);
+      border-color: transparent;
+    }
+    .coming-soon .card-arrow { display: none; }
+    .badge-soon {
+      font-size: 0.7em;
+      background: #e0e0e0;
+      color: #888;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .unicorn-footer {
+      text-align: center;
+      padding: 20px 0 40px;
+      font-size: 2em;
+      opacity: 0.5;
+    }
+
+    /* Rainbow divider */
+    .rainbow {
+      height: 4px;
+      background: linear-gradient(90deg, #f44336, #ff9800, #ffeb3b, #4caf50, #2196f3, #9c27b0);
+      border-radius: 2px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating sparkles -->
+  <div class="sparkles" id="sparkles"></div>
+
+  <div class="container">
+    <div class="header">
+      <div class="crown">&#x1F451;</div>
+      <h1>Victoria's Learning Castle</h1>
+      <div class="school-badge">
+        &#x1F3EB; BASIS Elementary <span>&bull;</span> 4Co
+      </div>
+      <p class="subtitle">&#x2728; Your magical study kingdom &#x2728;</p>
+    </div>
+
+    <div class="rainbow"></div>
+
+    <!-- 4th Grade Section -->
+    <div class="grade-section">
+      <div class="grade-header">
+        <span class="grade-icon">&#x1F4DA;</span>
+        <h2>4th Grade</h2>
+        <div class="grade-line"></div>
+      </div>
+
+      <a href="poetry-quest/" class="card">
+        <div class="card-icon">&#x270D;&#xFE0F;</div>
+        <div class="card-body">
+          <h3>Poetry Quest</h3>
+          <p>Learn 8 poetry types + elements: haiku, sonnets, limericks, imagery, rhyme schemes, and more!</p>
+        </div>
+        <div class="card-arrow">&#x279C;</div>
+      </a>
+
+      <div class="card coming-soon">
+        <div class="card-icon">&#x1F4D0;</div>
+        <div class="card-body">
+          <h3>Math Adventures <span class="badge-soon">Coming Soon</span></h3>
+          <p>Practice multiplication, fractions, and more</p>
+        </div>
+      </div>
+
+      <div class="card coming-soon">
+        <div class="card-icon">&#x1F30E;</div>
+        <div class="card-body">
+          <h3>Science Explorer <span class="badge-soon">Coming Soon</span></h3>
+          <p>Discover the world around you</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="unicorn-footer">
+    &#x1F984; &#x2B50; &#x1F308; &#x2B50; &#x1F984;
+  </div>
+
+  <script>
+    // Generate floating sparkles
+    const sparkleContainer = document.getElementById('sparkles');
+    const emojis = ['\u2728', '\u2B50', '\uD83E\uDD84', '\uD83C\uDF38', '\uD83E\uDD8B', '\uD83C\uDF1F', '\uD83D\uDC9C', '\u2764\uFE0F', '\uD83C\uDF3C', '\uD83D\uDC51'];
+    for (let i = 0; i < 20; i++) {
+      const span = document.createElement('span');
+      span.className = 'sparkle';
+      span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      span.style.left = Math.random() * 100 + '%';
+      span.style.top = Math.random() * 100 + '%';
+      span.style.animationDelay = (Math.random() * 6) + 's';
+      span.style.animationDuration = (4 + Math.random() * 4) + 's';
+      span.style.fontSize = (14 + Math.random() * 18) + 'px';
+      sparkleContainer.appendChild(span);
+    }
+  </script>
+</body>
+</html>
