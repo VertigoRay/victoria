@@ -2,662 +2,1303 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Victoria's Poetry Quest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Victoria's Poetry Castle</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      color: #333;
-    }
-    .container {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .card {
-      background: white;
-      border-radius: 20px;
-      padding: 28px;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    }
-    h1 {
-      text-align: center;
-      color: white;
-      font-size: 2em;
-      margin: 20px 0;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
-    .subtitle {
-      text-align: center;
-      color: rgba(255,255,255,0.9);
-      margin-bottom: 24px;
-      font-size: 1.1em;
-    }
-    .score-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255,255,255,0.2);
-      border-radius: 12px;
-      padding: 12px 20px;
-      margin-bottom: 20px;
-      color: white;
-      font-weight: 600;
-    }
-    .stars { font-size: 1.4em; letter-spacing: 2px; }
-    .streak { font-size: 0.9em; opacity: 0.9; }
-    .question-num {
-      font-size: 0.85em;
-      color: #888;
-      margin-bottom: 8px;
-    }
-    .question {
-      font-size: 1.2em;
-      font-weight: 600;
-      margin-bottom: 6px;
-      line-height: 1.4;
-    }
-    .poem-example {
-      background: #f8f5ff;
-      border-left: 4px solid #764ba2;
-      border-radius: 0 8px 8px 0;
-      padding: 14px 18px;
-      margin: 14px 0;
-      font-style: italic;
-      line-height: 1.6;
-      white-space: pre-line;
-      font-size: 0.95em;
-    }
-    .hint {
-      font-size: 0.85em;
-      color: #888;
-      margin-bottom: 16px;
-    }
-    .options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .option {
-      background: #f0edff;
-      border: 2px solid transparent;
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 1em;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
-    }
-    .option:hover { background: #e0dbff; transform: scale(1.02); }
-    .option:active { transform: scale(0.98); }
-    .option.correct {
-      background: #d4edda;
-      border-color: #28a745;
-      animation: pop 0.3s ease;
-    }
-    .option.wrong {
-      background: #f8d7da;
-      border-color: #dc3545;
-      animation: shake 0.4s ease;
-    }
-    .option.disabled { pointer-events: none; opacity: 0.7; }
-    .option.show-correct { background: #d4edda; border-color: #28a745; opacity: 1 !important; }
-    @keyframes pop {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1); }
-    }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-6px); }
-      75% { transform: translateX(6px); }
-    }
-    .feedback {
-      margin-top: 16px;
-      padding: 14px;
-      border-radius: 12px;
-      font-weight: 500;
-      display: none;
-      line-height: 1.5;
-    }
-    .feedback.correct { display: block; background: #d4edda; color: #155724; }
-    .feedback.wrong { display: block; background: #f8d7da; color: #721c24; }
-    .next-btn {
-      display: none;
-      width: 100%;
-      padding: 14px;
-      margin-top: 14px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 1.1em;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .next-btn:hover { transform: scale(1.02); }
-    .next-btn.show { display: block; }
-    .mode-select {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    .mode-btn {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      padding: 18px;
-      font-size: 1.1em;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .mode-btn:hover { transform: scale(1.03); }
-    .mode-btn small { display: block; font-weight: 400; opacity: 0.85; margin-top: 4px; font-size: 0.8em; }
-    .results {
-      text-align: center;
-    }
-    .results h2 { font-size: 1.6em; margin-bottom: 10px; }
-    .results .big-stars { font-size: 3em; margin: 16px 0; }
-    .results .score-text { font-size: 1.2em; margin-bottom: 8px; }
-    .results .message { font-size: 1em; color: #666; margin-bottom: 20px; }
-    .study-card {
-      background: #f8f5ff;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-      text-align: left;
-    }
-    .study-card h3 { color: #764ba2; margin-bottom: 6px; }
-    .study-card p { font-size: 0.9em; line-height: 1.5; }
-    .study-card .example {
-      font-style: italic;
-      margin-top: 6px;
-      padding: 8px;
-      background: white;
-      border-radius: 6px;
-      font-size: 0.85em;
-      white-space: pre-line;
-    }
-    .progress-bar {
-      height: 6px;
-      background: rgba(255,255,255,0.3);
-      border-radius: 3px;
-      margin-bottom: 16px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: #ffd700;
-      border-radius: 3px;
-      transition: width 0.3s ease;
-    }
-    .badge {
-      display: inline-block;
-      background: #ffd700;
-      color: #333;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.8em;
-      font-weight: 600;
-      margin: 2px;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600;700&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Quicksand',sans-serif;min-height:100vh;background:#1a1a2e;color:#eee;overflow-x:hidden;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+    .screen{display:none;min-height:100vh;padding:16px}
+    .screen.active{display:block}
+
+    /* Map */
+    .map-bg{background:linear-gradient(180deg,#0f0c29,#302b63 50%,#24243e)}
+    .map-header{text-align:center;padding:24px 0 8px}
+    .map-header h1{font-family:'Pacifico',cursive;font-size:1.8em;color:#ffd700;text-shadow:0 2px 10px rgba(255,215,0,.3)}
+    .gems-display{font-size:1.1em;color:#e0e0e0;margin-top:8px}
+    .castle-map{max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:14px;padding:16px 0}
+    .room-card{background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.05));border:2px solid rgba(255,255,255,.15);border-radius:16px;padding:18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .3s;-webkit-tap-highlight-color:transparent}
+    .room-card:active{transform:scale(.97)}
+    .room-card.locked{opacity:.4;cursor:default}
+    .room-card.completed{border-color:#4caf50}
+    .room-icon{font-size:2.2em;width:58px;height:58px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);border-radius:14px;flex-shrink:0}
+    .room-info h3{font-size:1.05em;font-weight:700;margin-bottom:3px}
+    .room-info p{font-size:.8em;opacity:.7;line-height:1.3}
+    .room-status{margin-left:auto;font-size:1.3em;flex-shrink:0}
+    .study-btn{display:block;text-align:center;margin:16px auto;padding:14px 28px;background:linear-gradient(135deg,#4a148c,#7b1fa2);color:white;border:none;border-radius:12px;font-size:1em;font-weight:600;cursor:pointer;font-family:'Quicksand',sans-serif}
+
+    /* Game chrome */
+    .game-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+    .back-btn{background:rgba(255,255,255,.15);border:none;color:white;padding:10px 16px;border-radius:10px;font-size:.9em;cursor:pointer;font-family:'Quicksand',sans-serif;font-weight:600;min-height:44px}
+    .game-title{font-family:'Pacifico',cursive;font-size:1.2em;color:#ffd700}
+    .game-gems{margin-left:auto;font-size:.95em}
+    .game-card{background:rgba(255,255,255,.08);border-radius:16px;padding:18px;margin-bottom:14px;max-width:500px;margin-left:auto;margin-right:auto}
+    .game-card h3{font-size:1em;margin-bottom:10px;color:#ffd700}
+
+    .progress-dots{display:flex;justify-content:center;gap:6px;margin:10px 0}
+    .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+    .dot.done{background:#4caf50}.dot.current{background:#ffd700;width:12px;height:12px}
+
+    .check-btn{display:block;margin:12px auto;padding:14px 32px;background:linear-gradient(135deg,#ffd700,#ffab00);color:#333;border:none;border-radius:12px;font-size:1.05em;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;min-height:48px}
+    .check-btn:disabled{opacity:.4}
+    .next-btn{display:none;margin:8px auto;padding:12px 28px;background:linear-gradient(135deg,#7b1fa2,#9c27b0);color:white;border:none;border-radius:12px;font-size:1em;font-weight:600;cursor:pointer;font-family:'Quicksand',sans-serif;min-height:48px}
+    .next-btn.show{display:block}
+    .feedback{text-align:center;padding:14px;border-radius:12px;margin:12px auto;max-width:500px;font-weight:600;display:none}
+    .feedback.show{display:block}
+    .feedback.ok{background:rgba(76,175,80,.2);color:#81c784}
+    .feedback.no{background:rgba(244,67,54,.2);color:#ef9a9a}
+    .feedback .small{font-size:.8em;font-weight:400;opacity:.8;margin-top:4px}
+
+    /* Syllable Kitchen */
+    .kitchen-bg{background:linear-gradient(180deg,#1a0a2e,#2d1b4e,#1a0a2e)}
+    .cauldron{text-align:center;margin:10px 0;font-size:3.5em;position:relative}
+    .steam{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:.4em;animation:steam 2s ease-in-out infinite}
+    @keyframes steam{0%,100%{opacity:.3;transform:translateX(-50%) translateY(0)}50%{opacity:.8;transform:translateX(-50%) translateY(-10px)}}
+
+    .syl-bar{display:flex;justify-content:center;gap:8px;margin:10px 0}
+    .syl-box{background:rgba(255,255,255,.1);border-radius:10px;padding:8px 14px;text-align:center;min-width:65px;border:2px solid transparent}
+    .syl-box .n{font-size:1.5em;font-weight:700}
+    .syl-box .t{font-size:.7em;opacity:.6}
+    .syl-box.ok{background:rgba(76,175,80,.2);border-color:#4caf50}
+    .syl-box.over{background:rgba(244,67,54,.2);border-color:#f44336}
+    .syl-box.active{border-color:#ffd700}
+
+    .haiku-display{margin:12px 0}
+    .h-line{padding:8px 12px;margin:4px 0;border-radius:8px;background:rgba(255,255,255,.05);min-height:38px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;font-style:italic;color:#ccc}
+    .h-line.cur{background:rgba(255,215,0,.08);border:1px dashed rgba(255,215,0,.4)}
+    .h-word{background:rgba(156,39,176,.3);padding:3px 8px;border-radius:6px;font-style:normal;color:#e1bee7;font-size:.9em}
+
+    .word-tray{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:10px}
+    .chip{background:linear-gradient(135deg,#7b1fa2,#9c27b0);color:white;padding:10px 16px;border-radius:20px;cursor:pointer;font-size:.95em;font-weight:600;font-family:'Quicksand',sans-serif;user-select:none;transition:all .15s;min-height:44px;display:flex;align-items:center}
+    .chip:active{transform:scale(.92)}
+    .chip.used{opacity:.25;pointer-events:none}
+    .undo{display:block;margin:8px auto;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:white;padding:10px 20px;border-radius:10px;cursor:pointer;font-family:'Quicksand',sans-serif;font-weight:600;min-height:44px}
+
+    /* Rhyme Painter */
+    .painter-bg{background:linear-gradient(180deg,#0d1b2a,#1b2838,#0d1b2a)}
+    .palette{display:flex;justify-content:center;gap:10px;margin:14px 0;flex-wrap:wrap}
+    .paint{width:52px;height:52px;border-radius:50%;cursor:pointer;border:3px solid transparent;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1em;color:white;transition:all .2s}
+    .paint:active{transform:scale(.9)}
+    .paint.sel{border-color:white;transform:scale(1.12);box-shadow:0 0 20px rgba(255,255,255,.3)}
+    .pa{background:#e91e63}.pb{background:#2196f3}.pc{background:#ff9800}.pe{background:rgba(255,255,255,.2);font-size:1.2em}
+
+    .poem-lines{margin:12px 0}
+    .p-line{padding:14px 16px;margin:6px 0;border-radius:10px;background:rgba(255,255,255,.08);cursor:pointer;display:flex;align-items:center;gap:12px;border-left:4px solid transparent;transition:all .2s;min-height:48px}
+    .p-line:active{background:rgba(255,255,255,.15)}
+    .lbl{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9em;flex-shrink:0;background:rgba(255,255,255,.15);transition:all .3s}
+    .la{background:#e91e63!important;color:white}.lb{background:#2196f3!important;color:white}.lc{background:#ff9800!important;color:white}
+    .ba{border-left-color:#e91e63}.bb{border-left-color:#2196f3}.bc{border-left-color:#ff9800}
+
+    /* Imagery Detective */
+    .detective-bg{background:linear-gradient(180deg,#1b2a1b,#2d3b2d,#1b2a1b)}
+    .passage{background:rgba(255,255,255,.06);border-radius:12px;padding:16px;line-height:2;margin:10px 0}
+    .passage-word{display:inline;padding:4px 2px;border-radius:4px;cursor:pointer;transition:all .15s}
+    .passage-word:active{transform:scale(.92)}
+    .passage-word.selected{background:#4caf50;color:white;padding:4px 6px}
+    .passage-word.correct{background:#2e7d32;color:white;padding:4px 6px}
+    .passage-word.wrong{background:#c62828;color:white;padding:4px 6px;animation:shake .4s ease}
+    .found-count{text-align:center;font-size:1.1em;margin:10px 0;color:#81c784}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+    /* Diamond Forge */
+    .forge-bg{background:linear-gradient(180deg,#2a1a0a,#3d2b1a,#2a1a0a)}
+    .diamond-shape{max-width:400px;margin:10px auto;text-align:center}
+    .d-line{margin:4px 0;min-height:40px;display:flex;justify-content:center;flex-wrap:wrap;gap:4px;align-items:center}
+    .d-slot{display:inline-block;background:rgba(255,255,255,.1);border:2px dashed rgba(255,255,255,.2);border-radius:8px;padding:8px 12px;min-width:60px;min-height:38px;margin:2px;font-size:.9em;transition:all .2s}
+    .d-slot.filled{background:rgba(255,215,0,.15);border-color:#ffd700;border-style:solid}
+    .d-label{font-size:.7em;opacity:.5;display:block;margin-bottom:6px}
+    .word-options{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px}
+    .w-opt{background:linear-gradient(135deg,#e65100,#ff9800);color:white;padding:10px 14px;border-radius:16px;cursor:pointer;font-size:.9em;font-weight:600;font-family:'Quicksand',sans-serif;min-height:44px;display:flex;align-items:center;transition:all .15s}
+    .w-opt:active{transform:scale(.92)}
+    .w-opt.picked{opacity:.25;pointer-events:none}
+
+    /* Dragon Battle */
+    .dragon-bg{background:linear-gradient(180deg,#2a0a0a,#3d1a1a,#2a0a0a)}
+    .dragon-arena{text-align:center;max-width:500px;margin:0 auto}
+    .dragon-sprite{font-size:4em;margin:10px 0;transition:all .3s}
+    .dragon-sprite.hit{animation:dragonHit .5s ease}
+    .dragon-sprite.attack{animation:dragonAttack .6s ease}
+    @keyframes dragonHit{0%{transform:scale(1)}30%{transform:scale(.8) rotate(-5deg)}100%{transform:scale(1)}}
+    @keyframes dragonAttack{0%{transform:scale(1)}50%{transform:scale(1.3) translateY(-10px)}100%{transform:scale(1)}}
+    .hp-bar{background:rgba(255,255,255,.1);border-radius:8px;height:20px;margin:6px 0;overflow:hidden;position:relative}
+    .hp-fill{height:100%;border-radius:8px;transition:width .5s ease}
+    .hp-dragon .hp-fill{background:linear-gradient(90deg,#f44336,#ff5722)}
+    .hp-princess .hp-fill{background:linear-gradient(90deg,#e040fb,#ce93d8)}
+    .hp-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.75em;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+    .battle-q{background:rgba(255,255,255,.08);border-radius:12px;padding:16px;margin:12px 0}
+    .battle-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .b-opt{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.15);border-radius:10px;padding:12px;text-align:center;cursor:pointer;font-weight:600;font-family:'Quicksand',sans-serif;min-height:48px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .b-opt:active{transform:scale(.95)}
+    .b-opt.right{background:rgba(76,175,80,.3);border-color:#4caf50}
+    .b-opt.nope{background:rgba(244,67,54,.3);border-color:#f44336}
+    .b-opt.dis{pointer-events:none;opacity:.6}
+    .spell-effect{font-size:2em;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:spellPop .8s ease forwards;z-index:99}
+    @keyframes spellPop{0%{opacity:1;transform:translate(-50%,-50%) scale(.5)}50%{transform:translate(-50%,-50%) scale(1.5)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}
+
+    /* Study */
+    .study-bg{background:linear-gradient(180deg,#1a0a2e,#2d1b4e)}
+    .s-card{background:rgba(255,255,255,.08);border-radius:12px;padding:14px;margin-bottom:10px;max-width:500px;margin-left:auto;margin-right:auto}
+    .s-card h3{color:#ffd700;margin-bottom:5px;font-size:1em}
+    .s-card p{font-size:.88em;line-height:1.5;opacity:.9}
+    .s-ex{font-style:italic;margin-top:6px;padding:8px;background:rgba(255,255,255,.05);border-radius:8px;font-size:.82em;white-space:pre-line;opacity:.8}
+    .s-title{color:#e040fb;font-size:1.05em;font-weight:700;margin:18px auto 8px;max-width:500px}
+    .s-title.elem{color:#ff9800}
+
+    /* Completion */
+    .complete-card{text-align:center}
+    .complete-card .big{font-size:3em;margin:10px 0}
+
+    /* Repair Shop */
+    .repair-bg{background:linear-gradient(180deg,#1a1a0a,#2d2d1a,#1a1a0a)}
+    .broken-poem{background:rgba(255,255,255,.06);border-radius:12px;padding:14px;margin:10px 0;line-height:1.8}
+    .fix-line{display:flex;align-items:center;gap:8px;margin:4px 0;flex-wrap:wrap}
+    .fix-line .text{flex:1;min-width:0}
+    .fix-line select{background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 12px;font-family:'Quicksand',sans-serif;font-size:.9em;min-height:44px;min-width:120px}
+    .fix-line select option{background:#333;color:white}
+    .fix-tag{font-size:.7em;padding:2px 8px;border-radius:10px;background:rgba(244,67,54,.3);color:#ef9a9a;white-space:nowrap}
+    .fix-tag.ok{background:rgba(76,175,80,.3);color:#81c784}
+
+    /* Mic Drop (Couplet) */
+    .mic-bg{background:linear-gradient(180deg,#0a0a2a,#1a1a3d,#0a0a2a)}
+    .mic-line{background:rgba(255,255,255,.08);border-radius:12px;padding:16px;margin:10px 0;font-size:1.1em;font-style:italic;text-align:center;line-height:1.5}
+    .mic-opts{display:grid;grid-template-columns:1fr;gap:8px;margin:10px 0}
+    .mic-opt{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);border-radius:12px;padding:14px;cursor:pointer;font-size:.95em;text-align:center;transition:all .15s;min-height:48px;font-family:'Quicksand',sans-serif}
+    .mic-opt:active{transform:scale(.97)}
+    .mic-opt.right{background:rgba(76,175,80,.3);border-color:#4caf50}
+    .mic-opt.nope{background:rgba(244,67,54,.3);border-color:#f44336}
+    .mic-opt.dis{pointer-events:none;opacity:.6}
+    .mic-opt.show-right{background:rgba(76,175,80,.3);border-color:#4caf50;opacity:1!important}
+    .mic-emoji{font-size:3em;text-align:center;margin:10px 0}
+
+    /* Acrostic Decoder */
+    .decoder-bg{background:linear-gradient(180deg,#0a1a2a,#1a2a3d,#0a1a2a)}
+    .acrostic-display{background:rgba(255,255,255,.06);border-radius:12px;padding:14px;margin:10px 0;line-height:1.8}
+    .acrostic-line{margin:3px 0}
+    .first-letter{font-weight:700;font-size:1.1em;color:#ffd700;border-bottom:2px solid rgba(255,215,0,.3);padding-bottom:1px}
+    .decode-input{display:flex;gap:8px;justify-content:center;margin:14px 0;align-items:center}
+    .decode-input input{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:10px;padding:12px 16px;color:white;font-family:'Quicksand',sans-serif;font-size:1.1em;font-weight:700;text-align:center;letter-spacing:4px;text-transform:uppercase;min-height:48px;width:200px}
+    .decode-input input::placeholder{color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:none}
+
+    /* Cinquain Counter */
+    .counter-bg{background:linear-gradient(180deg,#1a0a1a,#2d1a2d,#1a0a1a)}
+    .count-line{display:flex;align-items:center;gap:10px;margin:6px 0;padding:10px;background:rgba(255,255,255,.05);border-radius:10px}
+    .count-line .poem-text{flex:1;font-style:italic}
+    .count-btns{display:flex;gap:4px;align-items:center}
+    .count-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:white;font-size:1.1em;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;display:flex;align-items:center;justify-content:center;min-height:36px}
+    .count-btn:active{transform:scale(.9)}
+    .count-val{width:32px;text-align:center;font-size:1.2em;font-weight:700}
+    .count-target{font-size:.7em;opacity:.5;text-align:center}
+    .count-line.right{background:rgba(76,175,80,.15)}
+    .count-line.wrong{background:rgba(244,67,54,.15)}
+
+    /* Limerick Fill-in */
+    .limerick-bg{background:linear-gradient(180deg,#1a2a0a,#2d3d1a,#1a2a0a)}
+    .limerick-display{background:rgba(255,255,255,.06);border-radius:12px;padding:14px;margin:10px 0;line-height:2;font-style:italic;font-size:1.05em}
+    .blank-line{display:inline;border-bottom:2px dashed #ffd700;padding:2px 20px;font-style:normal;color:#ffd700}
+
+    /* Story banner */
+    .story-banner{background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);border-radius:12px;padding:12px 16px;margin:8px auto 16px;max-width:500px;text-align:center;font-size:.85em;color:#ffd700;line-height:1.4}
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Victoria's Poetry Quest</h1>
-    <div id="app"></div>
+
+<div class="screen map-bg active" id="s-map">
+  <div class="map-header">
+    <div style="font-size:2em">&#x1F3F0;</div>
+    <h1>Victoria's Poetry Castle</h1>
+    <div class="gems-display">&#x1F48E; <span id="gem-count">0</span> gems</div>
   </div>
+  <div class="story-banner">&#x1F4DC; The Poetry Dragon has stolen all the poems from the castle! Complete each room to recover them and defeat the dragon!</div>
+  <div class="castle-map" id="room-list"></div>
+  <button class="study-btn" onclick="go('test')" style="background:linear-gradient(135deg,#c62828,#e53935);margin-bottom:8px">&#x1F4DD; Practice Test</button>
+  <button class="study-btn" onclick="go('study')">&#x1F4DA; Study Guide</button>
+</div>
+
+<div class="screen kitchen-bg" id="s-kitchen">
+  <div class="game-bar">
+    <button class="back-btn" onclick="go('map')">&#x2190; Castle</button>
+    <div class="game-title">&#x1F9EA; Syllable Kitchen</div>
+    <div class="game-gems">&#x1F48E; <span id="k-gems">0</span></div>
+  </div>
+  <div class="progress-dots" id="k-dots"></div>
+  <div id="k-area"></div>
+</div>
+
+<div class="screen painter-bg" id="s-painter">
+  <div class="game-bar">
+    <button class="back-btn" onclick="go('map')">&#x2190; Castle</button>
+    <div class="game-title">&#x1F3A8; Rhyme Painter</div>
+    <div class="game-gems">&#x1F48E; <span id="p-gems">0</span></div>
+  </div>
+  <div class="progress-dots" id="p-dots"></div>
+  <div id="p-area"></div>
+</div>
+
+<div class="screen detective-bg" id="s-detective">
+  <div class="game-bar">
+    <button class="back-btn" onclick="go('map')">&#x2190; Castle</button>
+    <div class="game-title">&#x1F50D; Imagery Detective</div>
+    <div class="game-gems">&#x1F48E; <span id="d-gems">0</span></div>
+  </div>
+  <div class="progress-dots" id="d-dots"></div>
+  <div id="d-area"></div>
+</div>
+
+<div class="screen forge-bg" id="s-forge">
+  <div class="game-bar">
+    <button class="back-btn" onclick="go('map')">&#x2190; Castle</button>
+    <div class="game-title">&#x2666;&#xFE0F; Diamond Forge</div>
+    <div class="game-gems">&#x1F48E; <span id="f-gems">0</span></div>
+  </div>
+  <div class="progress-dots" id="f-dots"></div>
+  <div id="f-area"></div>
+</div>
+
+<div class="screen" id="s-elements" style="background:linear-gradient(180deg,#2a1a0a,#3d2b1a,#2a1a0a)">
+  <div class="game-bar"><button class="back-btn" onclick="go('map')">&#x2190; Castle</button><div class="game-title">&#x1F3F0; Element Tower</div><div class="game-gems">&#x1F48E; <span id="el-gems">0</span></div></div>
+  <div class="progress-dots" id="el-dots"></div><div id="el-area"></div>
+</div>
+<div class="screen dragon-bg" id="s-dragon">
+  <div class="game-bar">
+    <button class="back-btn" onclick="go('map')">&#x2190; Castle</button>
+    <div class="game-title">&#x1F409; Poetry Dragon</div>
+    <div class="game-gems">&#x1F48E; <span id="b-gems">0</span></div>
+  </div>
+  <div id="b-area"></div>
+</div>
+
+<div class="screen repair-bg" id="s-repair">
+  <div class="game-bar"><button class="back-btn" onclick="go('map')">&#x2190; Castle</button><div class="game-title">&#x1F527; Repair Shop</div><div class="game-gems">&#x1F48E; <span id="r-gems">0</span></div></div>
+  <div class="progress-dots" id="r-dots"></div><div id="r-area"></div>
+</div>
+<div class="screen mic-bg" id="s-mic">
+  <div class="game-bar"><button class="back-btn" onclick="go('map')">&#x2190; Castle</button><div class="game-title">&#x1F3A4; Mic Drop</div><div class="game-gems">&#x1F48E; <span id="m-gems">0</span></div></div>
+  <div class="progress-dots" id="m-dots"></div><div id="m-area"></div>
+</div>
+<div class="screen decoder-bg" id="s-decoder">
+  <div class="game-bar"><button class="back-btn" onclick="go('map')">&#x2190; Castle</button><div class="game-title">&#x1F510; Acrostic Decoder</div><div class="game-gems">&#x1F48E; <span id="ac-gems">0</span></div></div>
+  <div class="progress-dots" id="ac-dots"></div><div id="ac-area"></div>
+</div>
+<div class="screen counter-bg" id="s-counter">
+  <div class="game-bar"><button class="back-btn" onclick="go('map')">&#x2190; Castle</button><div class="game-title">&#x1F522; Cinquain Counter</div><div class="game-gems">&#x1F48E; <span id="cc-gems">0</span></div></div>
+  <div class="progress-dots" id="cc-dots"></div><div id="cc-area"></div>
+</div>
+<div class="screen limerick-bg" id="s-limerick">
+  <div class="game-bar"><button class="back-btn" onclick="go('map')">&#x2190; Castle</button><div class="game-title">&#x1F923; Limerick Lab</div><div class="game-gems">&#x1F48E; <span id="ll-gems">0</span></div></div>
+  <div class="progress-dots" id="ll-dots"></div><div id="ll-area"></div>
+</div>
+<div class="screen" id="s-test" style="background:linear-gradient(180deg,#1a1a1a,#2d2d2d)">
+  <div class="game-bar"><button class="back-btn" onclick="go('map')">&#x2190; Castle</button><div class="game-title">&#x1F4DD; Practice Test</div></div>
+  <div id="test-area"></div>
+</div>
+<div class="screen study-bg" id="s-study">
+  <div class="game-bar">
+    <button class="back-btn" onclick="go('map')">&#x2190; Castle</button>
+    <div class="game-title">&#x1F4DA; Study Guide</div>
+  </div>
+  <div id="study-body"></div>
+</div>
 
 <script>
-const POETRY_TYPES = {
-  acrostic: {
-    name: "Acrostic",
-    rules: "The first letters of each line spell out a word or phrase.",
-    example: "An acrostic poem\nCan be about anything\nReally\nOf course, some people like to\nStart each line as a sentence,\nThough\nI prefer words into a\nCreation that is more freeform.",
-    syllables: null,
-    lines: null,
-    rhyme: null,
-  },
-  haiku: {
-    name: "Haiku",
-    rules: "An unrhymed three-line poem based on a traditional Japanese form. Line 1: 5 syllables, Line 2: 7 syllables, Line 3: 5 syllables.",
-    example: "An old silent pond\nA frog jumps into the pond\nSplash! Silence again",
-    syllables: "5-7-5",
-    lines: 3,
-    rhyme: "none",
-  },
-  diamante: {
-    name: "Diamante",
-    rules: "Seven lines long shaped like a diamond. Line 1: noun, Line 2: two adjectives, Line 3: three verbs, Line 4: four nouns, Line 5: three verbs, Line 6: two adjectives, Line 7: noun (synonym or antonym of line 1).",
-    example: "Day\nBright, Warm\nShining, Glowing, Radiating\nDay, Light, Energy, Hope\nSetting, Dimming, Fading\nCalm, Peaceful\nNight",
-    syllables: null,
-    lines: 7,
-    rhyme: "none",
-  },
-  cinquain: {
-    name: "Cinquain",
-    rules: "Five lines long. Syllable pattern: 2, 4, 6, 8, 2. Tells a story. Does not need to rhyme but can.",
-    example: "Nightfall\nShadows creeping\nSilently darkness falls\nThe moon rises up to light the\nNew night",
-    syllables: "2-4-6-8-2",
-    lines: 5,
-    rhyme: "optional",
-  },
-  limerick: {
-    name: "Limerick",
-    rules: "A humorous poem with exactly 5 lines and 13 beats. Follows the AABBA rhyme scheme. Lines 1, 2, 5 have 7-9 syllables. Lines 3, 4 have 5-7 syllables.",
-    example: "A lim'rick's not hard to define\nBut it needs to do more than just rhyme\nIt's the meter that matters\nThe pitters and patters\nIf not, you're just wasting my time.",
-    syllables: "7-9 / 7-9 / 5-7 / 5-7 / 7-9",
-    lines: 5,
-    rhyme: "AABBA",
-  },
-  couplet: {
-    name: "Couplet",
-    rules: "A pair of lines that rhyme. Can be a complete poem or part of a longer one.",
-    example: "The artist stirred some blue and green\nTo paint an underwater scene.",
-    syllables: null,
-    lines: 2,
-    rhyme: "AA",
-  },
-  sonnet: {
-    name: "Sonnet",
-    rules: "Fourteen lines long with 10 syllables each. Three stanzas of four lines (quatrains) with ABAB rhyme, followed by a final couplet with AA rhyme. First line states the theme, final couplet provides the conclusion.",
-    example: null,
-    syllables: "10 per line",
-    lines: 14,
-    rhyme: "ABAB ABAB ABAB AA",
-  },
-  freeverse: {
-    name: "Free Verse",
-    rules: "No rules about rhyme, meter, or line count. The poet works hard to create something beautiful and meaningful without specific guidelines.",
-    example: "Up. Up.\nClick, click.\nWind blows\nsharp in my ears.\nMy heart jumps. Skips.\nIt's up. It's up higher.",
-    syllables: null,
-    lines: null,
-    rhyme: "none",
-  },
-};
+// ===== SYLLABLE HELPER =====
+const SYL={the:1,a:1,an:1,old:1,new:1,big:1,red:1,blue:1,green:1,bright:1,dark:1,cold:1,warm:1,soft:1,loud:1,still:1,calm:1,deep:1,high:1,moon:1,sun:1,star:1,rain:1,snow:1,wind:1,leaf:1,tree:1,pond:1,frog:1,bird:1,sky:1,night:1,day:1,light:1,spring:1,falls:1,jumps:1,glows:1,shines:1,melts:1,drifts:1,sleeps:1,wakes:1,sings:1,flies:1,blooms:1,splash:1,crash:1,dream:1,clouds:1,breeze:1,trees:1,leaves:1,peace:1,waves:1,dance:1,white:1,black:1,frost:1,lake:1,stream:1,stones:1,wings:1,cool:1,
+silent:2,gentle:2,golden:2,silver:2,dancing:2,falling:2,floating:2,glowing:2,shining:2,sleeping:2,waking:2,singing:2,flying:2,blooming:2,morning:2,evening:2,sunset:2,moonlight:2,starlight:2,dewdrop:2,rainbow:2,river:2,flower:2,garden:2,mountain:2,ocean:2,whisper:2,softly:2,slowly:2,quickly:2,gently:2,above:2,below:2,again:2,into:2,silence:2,ripple:2,cricket:2,covers:2,frozen:2,petals:2,summer:2,winter:2,autumn:2,wander:2,swaying:2,resting:2,
+beautiful:3,waterfall:3,butterfly:3,dragonfly:3,tenderly:3,silently:3,quietly:3,magical:3,wonderful:3,sparkling:3,hovering:3,whispering:3,evergreen:3,memories:3,firefly:3,snowflakes:2,};
+function syl(w){const k=w.toLowerCase().replace(/[^a-z]/g,'');if(SYL[k]!==undefined)return SYL[k];let c=0,pv=false;for(let i=0;i<k.length;i++){const v='aeiouy'.includes(k[i]);if(v&&!pv)c++;pv=v}if(k.endsWith('e')&&c>1)c--;return Math.max(1,c)}
+function lineSyl(words){return words.reduce((s,w)=>s+syl(w),0)}
 
-const POETRY_ELEMENTS = {
-  rhyme_scheme: {
-    name: "Rhyme Scheme",
-    definition: "The pattern of rhyming lines in a poem. Common patterns include AABB (first two lines rhyme, next two rhyme) and ABAB (every other line rhymes).",
-    example: "Roses are red, (A)\nViolets are blue, (B)\nSugar is sweet, (A)\nAnd so are you. (B)\n\nThis is ABAB because lines 1 & 3 rhyme, and lines 2 & 4 rhyme.",
-  },
-  imagery: {
-    name: "Imagery",
-    definition: "Words that help you picture something in your mind. They paint a picture using your senses - what you see, hear, feel, smell, or taste.",
-    example: "\"Feathered wings\" helps you imagine soft, delicate bird wings.\n\"The crackling fire warmed her icy fingers\" - you can feel the cold and hear the fire.",
-  },
-  repetition: {
-    name: "Repetition",
-    definition: "Repeating words or phrases in a poem for effect. It can make ideas stronger, create rhythm, or make something memorable.",
-    example: "\"I have a dream\" (repeated by MLK Jr.)\n\"Stop, stop, stop!\" - repeating the word makes it more urgent.",
-  },
-  theme: {
-    name: "Theme",
-    definition: "The lesson or message of the poem. It's the big idea the poet wants you to understand. For example: \"Nobody is perfect.\"",
-    example: "A poem about a kid who makes mistakes but keeps trying might have the theme: \"Never give up\" or \"It's okay to fail.\"",
-  },
-};
+// ===== DATA =====
+const HAIKUS=[
+  {words:["an","old","silent","pond","a","frog","jumps","into","the","splash","silence","again","soft","moonlight","on"]},
+  {words:["golden","sun","melts","soft","morning","light","drifts","gently","through","the","trees","birds","sing","above","spring"]},
+  {words:["snowflakes","fall","soft","cold","winter","wind","white","covers","frozen","lake","a","still","deep","silence","sleeps"]},
+  {words:["butterfly","floats","on","gentle","breeze","dancing","through","the","garden","blooms","bright","petals","wave","in","spring"]},
+];
 
-const ELEMENT_NAMES = Object.values(POETRY_ELEMENTS).map(e => e.name);
+const RHYMES=[
+  {title:"AABB",lines:["The cat sat on the mat so fat,","And wore upon his head a hat.","The dog ran down the street so fast,","The race was over, he came last."],key:["A","A","B","B"],hint:"Lines that END with the same sound get the same color!"},
+  {title:"ABAB",lines:["Roses are red,","Violets are blue,","Sugar is sweet,","And so are you."],key:["A","B","A","B"],hint:"Every OTHER line rhymes. Try alternating colors!"},
+  {title:"ABAB",lines:["The stars are shining in the night,","The moon is full and round,","They fill the sky with silver light,","And sparkle all around."],key:["A","B","A","B"],hint:"night/light rhyme. round/around rhyme."},
+  {title:"AABB",lines:["I like to run and jump and play,","I do it almost every day.","I love to swim and splash around,","And roll upon the grassy ground."],key:["A","A","B","B"],hint:"First two lines rhyme together, then the next two."},
+  {title:"ABCB",lines:["I went walking yesterday,","To see what I could find,","I found a little hidden bay,","And left the world behind."],key:["A","B","A","B"],hint:"yesterday/bay rhyme. find/behind rhyme."},
+];
 
-const TYPES = Object.keys(POETRY_TYPES);
-const TYPE_NAMES = TYPES.map(t => POETRY_TYPES[t].name);
+const STUDY_TYPES=[
+  {n:"Acrostic",r:"The first letters of each line spell out a word or phrase.",e:"An acrostic poem\nCan be about anything\nReally\nOf course, some people like to\nStart each line as a sentence"},
+  {n:"Haiku",r:"Three unrhymed lines. Syllable pattern: 5-7-5. Based on traditional Japanese poetry.",e:"An old silent pond\nA frog jumps into the pond\nSplash! Silence again"},
+  {n:"Diamante",r:"Seven lines in a diamond shape. Line 1 & 7: nouns (opposites). Lines 2 & 6: adjectives. Lines 3 & 5: verbs. Line 4: four nouns.",e:"Day\nBright, Warm\nShining, Glowing, Radiating\nDay, Light, Energy, Hope\nSetting, Dimming, Fading\nCalm, Peaceful\nNight"},
+  {n:"Cinquain",r:"Five lines. Syllable pattern: 2-4-6-8-2. Tells a story. Doesn't need to rhyme."},
+  {n:"Limerick",r:"Humorous. 5 lines, 13 beats. AABBA rhyme scheme. Lines 1,2,5: 7-9 syllables. Lines 3,4: 5-7 syllables.",e:"A lim'rick's not hard to define\nBut it needs to do more than just rhyme\nIt's the meter that matters\nThe pitters and patters\nIf not, you're just wasting my time."},
+  {n:"Couplet",r:"A pair of lines that rhyme. Can be a whole poem or part of one.",e:"The artist stirred some blue and green\nTo paint an underwater scene."},
+  {n:"Sonnet",r:"14 lines, 10 syllables each. Three quatrains (ABAB rhyme) + final couplet (AA). First line = theme, couplet = conclusion."},
+  {n:"Free Verse",r:"No rules! No required rhyme, meter, or line count. The poet creates beauty without guidelines.",e:"Up. Up.\nClick, click.\nWind blows\nsharp in my ears.\nMy heart jumps. Skips."},
+];
+const STUDY_ELEM=[
+  {n:"Rhyme Scheme",d:"The pattern of rhyming lines. AABB = first two lines rhyme, next two rhyme. ABAB = every other line rhymes.",e:"Roses are red, (A)\nViolets are blue, (B)\nSugar is sweet, (A)\nAnd so are you. (B) = ABAB"},
+  {n:"Imagery",d:"Words that help you picture something using your senses: see, hear, feel, smell, taste.",e:"\"Feathered wings\" - you imagine soft bird wings.\n\"The crackling fire warmed her icy fingers\""},
+  {n:"Repetition",d:"Repeating words or phrases to make ideas stronger or create rhythm.",e:"\"Stop, stop, stop!\" - repeating makes it more urgent."},
+  {n:"Theme",d:"The lesson or message of the poem. The big idea the poet wants you to understand.",e:"\"Nobody is perfect\" - a poem about making mistakes might have this theme."},
+];
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+// ===== STATE =====
+let G={gems:0,rooms:{},k:{round:0,gems:0,lines:[[],[],[]],cur:0},p:{round:0,gems:0,colors:[],sel:'A'}};
+function load(){try{const d=JSON.parse(localStorage.getItem('vpc2')||'{}');if(d.gems!==undefined)G.gems=d.gems;if(d.rooms)G.rooms=d.rooms}catch(e){}}
+function save(){localStorage.setItem('vpc2',JSON.stringify({gems:G.gems,rooms:G.rooms}))}
+load();
+
+const ROOMS=[
+  {id:'kitchen',name:'Syllable Kitchen',icon:'\uD83E\uDDEA',desc:'Brew haiku poems with the perfect syllable count!',open:true},
+  {id:'painter',name:'Rhyme Painter',icon:'\uD83C\uDFA8',desc:'Paint rhyme scheme patterns on poems!',open:true},
+  {id:'detective',name:'Imagery Detective',icon:'\uD83D\uDD0D',desc:'Find imagery hiding in poems!',open:true},
+  {id:'forge',name:'Diamond Forge',icon:'\u2666\uFE0F',desc:'Build diamante poems word by word!',open:true},
+  {id:'repair',name:'Repair Shop',icon:'\uD83D\uDD27',desc:'Fix broken poems - wrong syllables, busted rhymes!',open:true},
+  {id:'mic',name:'Mic Drop',icon:'\uD83C\uDFA4',desc:'Complete the couplet with the perfect rhyme!',open:true},
+  {id:'decoder',name:'Acrostic Decoder',icon:'\uD83D\uDD10',desc:'Crack the secret code hidden in poems!',open:true},
+  {id:'counter',name:'Cinquain Counter',icon:'\uD83D\uDD22',desc:'Count syllables to verify the 2-4-6-8-2 pattern!',open:true},
+  {id:'limerick',name:'Limerick Lab',icon:'\uD83E\uDD23',desc:'Pick the funniest punchline to finish the limerick!',open:true},
+  {id:'elements',name:'Element Tower',icon:'\uD83C\uDFF0',desc:'Master rhyme scheme, imagery, repetition, and theme!',open:true},
+  {id:'dragon',name:'Poetry Dragon',icon:'\uD83D\uDC09',desc:'Final boss! Battle the dragon with everything you learned!',open:true},
+];
+
+// ===== NAV =====
+function go(screen){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  if(screen==='map'){document.getElementById('s-map').classList.add('active');renderMap()}
+  else if(screen==='kitchen'){document.getElementById('s-kitchen').classList.add('active');initK()}
+  else if(screen==='painter'){document.getElementById('s-painter').classList.add('active');initP()}
+  else if(screen==='detective'){document.getElementById('s-detective').classList.add('active');initD()}
+  else if(screen==='forge'){document.getElementById('s-forge').classList.add('active');initF()}
+  else if(screen==='repair'){document.getElementById('s-repair').classList.add('active');initR()}
+  else if(screen==='mic'){document.getElementById('s-mic').classList.add('active');initM()}
+  else if(screen==='decoder'){document.getElementById('s-decoder').classList.add('active');initAC()}
+  else if(screen==='counter'){document.getElementById('s-counter').classList.add('active');initCC()}
+  else if(screen==='limerick'){document.getElementById('s-limerick').classList.add('active');initLL()}
+  else if(screen==='elements'){document.getElementById('s-elements').classList.add('active');initEL()}
+  else if(screen==='dragon'){document.getElementById('s-dragon').classList.add('active');initB()}
+  else if(screen==='test'){document.getElementById('s-test').classList.add('active');initTest()}
+  else if(screen==='study'){document.getElementById('s-study').classList.add('active');renderStudy()}
 }
 
-function pickRandom(arr, exclude) {
-  const filtered = arr.filter(x => x !== exclude);
-  return filtered[Math.floor(Math.random() * filtered.length)];
-}
-
-function generateQuestions(mode) {
-  const questions = [];
-
-  if (mode === "identify") {
-    // Show a description/example, identify the type
-    for (const key of shuffle(TYPES)) {
-      const t = POETRY_TYPES[key];
-      const q = { answer: t.name, options: [] };
-
-      // Vary the question format
-      const formats = [];
-      if (t.example) formats.push("example");
-      if (t.rules) formats.push("rules");
-      if (t.lines) formats.push("lines");
-      if (t.rhyme && t.rhyme !== "none") formats.push("rhyme");
-
-      const fmt = formats[Math.floor(Math.random() * formats.length)];
-
-      if (fmt === "example" && t.example) {
-        q.question = "What type of poem is this?";
-        q.poem = t.example;
-      } else if (fmt === "rhyme" && t.rhyme) {
-        q.question = `Which poem type uses the ${t.rhyme} rhyme scheme?`;
-      } else if (fmt === "lines" && t.lines) {
-        q.question = `Which poem type has exactly ${t.lines} lines?`;
-        if (t.lines === 5) q.hint = "There are two 5-line types - look for other clues!";
-      } else {
-        q.question = "Which poem type matches this description?";
-        q.hint = t.rules;
-      }
-
-      // Build options: correct + 3 wrong
-      q.options = [t.name];
-      while (q.options.length < 4) {
-        const wrong = pickRandom(TYPE_NAMES, t.name);
-        if (!q.options.includes(wrong)) q.options.push(wrong);
-      }
-      q.options = shuffle(q.options);
-      q.explanation = t.rules;
-      questions.push(q);
-    }
-  } else if (mode === "rules") {
-    // Test specific rules knowledge
-    const ruleQs = [
-      { q: "How many syllables does the first line of a haiku have?", a: "5", opts: ["3", "5", "7", "10"] },
-      { q: "How many syllables does the second line of a haiku have?", a: "7", opts: ["5", "7", "9", "3"] },
-      { q: "What rhyme scheme does a limerick follow?", a: "AABBA", opts: ["ABAB", "AABBA", "ABBA", "AABB"] },
-      { q: "How many lines does a sonnet have?", a: "14", opts: ["10", "12", "14", "16"] },
-      { q: "In a diamante, what type of word goes on line 1?", a: "Noun", opts: ["Verb", "Adjective", "Noun", "Adverb"] },
-      { q: "In a diamante, what type of words go on lines 2 and 6?", a: "Adjectives", opts: ["Nouns", "Verbs", "Adjectives", "Adverbs"] },
-      { q: "In a diamante, what type of words go on lines 3 and 5?", a: "Verbs", opts: ["Nouns", "Verbs", "Adjectives", "Pronouns"] },
-      { q: "How many lines does a cinquain have?", a: "5", opts: ["3", "4", "5", "7"] },
-      { q: "What is the syllable pattern of a cinquain?", a: "2-4-6-8-2", opts: ["5-7-5", "2-4-6-8-2", "1-2-3-4-5", "3-5-7-5-3"] },
-      { q: "In an acrostic poem, what do the first letters of each line do?", a: "Spell a word", opts: ["Rhyme", "Spell a word", "Count syllables", "Repeat"] },
-      { q: "A couplet is a pair of lines that ___.", a: "Rhyme", opts: ["Rhyme", "Have 5 syllables", "Don't rhyme", "Are questions"] },
-      { q: "How many syllables per line does a sonnet have?", a: "10", opts: ["5", "7", "10", "14"] },
-      { q: "What rhyme scheme do the stanzas (quatrains) of a sonnet use?", a: "ABAB", opts: ["AABB", "ABAB", "AABBA", "ABBA"] },
-      { q: "How many beats (total) does a limerick have?", a: "13", opts: ["10", "13", "15", "17"] },
-      { q: "Lines 1, 2, and 5 of a limerick usually have how many syllables?", a: "7-9", opts: ["3-5", "5-7", "7-9", "10-12"] },
-      { q: "Which poetry type has NO rules about rhyme or meter?", a: "Free Verse", opts: ["Haiku", "Free Verse", "Sonnet", "Limerick"] },
-      { q: "In a diamante, what is the last word?", a: "A synonym or antonym of the first word", opts: ["The same word as line 1", "A verb", "A synonym or antonym of the first word", "A rhyming word"] },
-      { q: "The final two lines of a sonnet are called a ___.", a: "Couplet", opts: ["Stanza", "Couplet", "Diamante", "Haiku"] },
-      { q: "Which type of poem is always humorous?", a: "Limerick", opts: ["Haiku", "Sonnet", "Limerick", "Free Verse"] },
-      { q: "A haiku is based on a traditional ___ poetic form.", a: "Japanese", opts: ["French", "Japanese", "English", "Italian"] },
-    ];
-
-    for (const rq of shuffle(ruleQs)) {
-      questions.push({
-        question: rq.q,
-        answer: rq.a,
-        options: shuffle(rq.opts),
-        explanation: null,
-      });
-    }
-  } else if (mode === "elements") {
-    const elemQs = [
-      { q: "What is a rhyme scheme?", a: "The pattern of rhyming lines", opts: ["The pattern of rhyming lines", "The number of syllables", "The topic of the poem", "The rhythm of the poem"] },
-      { q: "AABB means:", a: "Lines 1 & 2 rhyme, lines 3 & 4 rhyme", opts: ["Lines 1 & 2 rhyme, lines 3 & 4 rhyme", "Every other line rhymes", "No lines rhyme", "All lines rhyme with each other"] },
-      { q: "ABAB means:", a: "Every other line rhymes", opts: ["Lines 1 & 2 rhyme together", "Every other line rhymes", "Only the last two lines rhyme", "Nothing rhymes"] },
-      { q: "What is imagery?", a: "Words that help you picture something", opts: ["Words that rhyme", "Words that help you picture something", "Words that repeat", "The title of the poem"] },
-      { q: "\"Feathered wings\" is an example of:", a: "Imagery", opts: ["Rhyme Scheme", "Imagery", "Repetition", "Theme"] },
-      { q: "\"The golden sun melted into the purple horizon\" is an example of:", a: "Imagery", opts: ["Repetition", "Theme", "Imagery", "Rhyme Scheme"] },
-      { q: "What is repetition in poetry?", a: "Repeating words or phrases", opts: ["Using big words", "Repeating words or phrases", "Writing about nature", "Making lines rhyme"] },
-      { q: "\"Stop, stop, stop!\" is an example of:", a: "Repetition", opts: ["Imagery", "Theme", "Rhyme Scheme", "Repetition"] },
-      { q: "What is the theme of a poem?", a: "The lesson or message", opts: ["The title", "The rhyme pattern", "The lesson or message", "The number of lines"] },
-      { q: "\"Nobody is perfect\" is an example of a poem's:", a: "Theme", opts: ["Rhyme Scheme", "Imagery", "Repetition", "Theme"] },
-      { q: "A poem about a kid who keeps trying after failing might have the theme:", a: "Never give up", opts: ["Cats are cool", "Never give up", "AABB", "Feathered wings"] },
-      { q: "Which element makes you use your senses (see, hear, feel, smell, taste)?", a: "Imagery", opts: ["Theme", "Repetition", "Rhyme Scheme", "Imagery"] },
-      { q: "Which element gives the poem rhythm by saying things more than once?", a: "Repetition", opts: ["Imagery", "Repetition", "Theme", "Rhyme Scheme"] },
-      { q: "In AABB, which lines rhyme with each other?", a: "1 with 2, and 3 with 4", opts: ["1 with 3, and 2 with 4", "1 with 2, and 3 with 4", "1 with 4, and 2 with 3", "None of them"] },
-      { q: "\"The icy wind bit her cheeks\" uses imagery for which sense?", a: "Touch (feeling)", opts: ["Sight", "Sound", "Touch (feeling)", "Taste"] },
-      { q: "\"I can see it, I can see it, I can see it now!\" uses:", a: "Repetition", opts: ["Imagery", "Repetition", "Theme", "Rhyme Scheme"] },
-    ];
-
-    for (const eq of shuffle(elemQs).slice(0, 10)) {
-      questions.push({
-        question: eq.q,
-        answer: eq.a,
-        options: shuffle(eq.opts),
-        explanation: null,
-      });
-    }
-  } else if (mode === "match") {
-    // Match poem to its type - show short examples
-    const examples = [
-      { poem: "An old silent pond\nA frog jumps into the pond\nSplash! Silence again", answer: "Haiku", explain: "Three lines with 5-7-5 syllables." },
-      { poem: "The artist stirred some blue and green\nTo paint an underwater scene.", answer: "Couplet", explain: "Two lines that rhyme." },
-      { poem: "Day\nBright, Warm\nShining, Glowing, Radiating\nDay, Light, Energy, Hope\nSetting, Dimming, Fading\nCalm, Peaceful\nNight", answer: "Diamante", explain: "Seven lines in a diamond shape with specific word types." },
-      { poem: "A lim'rick's not hard to define\nBut it needs to do more than just rhyme\nIt's the meter that matters\nThe pitters and patters\nIf not, you're just wasting my time.", answer: "Limerick", explain: "Five humorous lines with AABBA rhyme." },
-      { poem: "Up. Up.\nClick, click.\nWind blows\nsharp in my ears.\nMy heart jumps. Skips.", answer: "Free Verse", explain: "No rules about rhyme or meter." },
-      { poem: "Sunlight\nGolden and warm\nDancing across the meadow\nButterflies flutter their painted wings\nSpringtime", answer: "Cinquain", explain: "Five lines with 2-4-6-8-2 syllables." },
-      { poem: "Joyful\nAlways smiling\nCaring for everyone\nKind to all she meets\nOn a mission to spread\nRadiant happiness to\nInspire the world\nAnytime, anywhere", answer: "Acrostic", explain: "First letters spell out a word - JCKORDIA... wait, this spells JACKORIN... Actually, the first letters spell something!" },
-    ];
-
-    for (const ex of shuffle(examples)) {
-      const q = {
-        question: "What type of poem is this?",
-        poem: ex.poem,
-        answer: ex.answer,
-        options: [ex.answer],
-        explanation: ex.explain,
-      };
-      while (q.options.length < 4) {
-        const wrong = pickRandom(TYPE_NAMES, ex.answer);
-        if (!q.options.includes(wrong)) q.options.push(wrong);
-      }
-      q.options = shuffle(q.options);
-      questions.push(q);
-    }
-  }
-
-  return questions.slice(0, 10);
-}
-
-// Game state
-let state = {
-  screen: "menu",
-  mode: null,
-  questions: [],
-  current: 0,
-  score: 0,
-  streak: 0,
-  bestStreak: 0,
-  answered: false,
-};
-
-function render() {
-  const app = document.getElementById("app");
-
-  if (state.screen === "menu") {
-    app.innerHTML = `
-      <div class="subtitle">Learn your poetry types!</div>
-      <div class="card">
-        <div class="mode-select">
-          <button class="mode-btn" onclick="startGame('identify')">
-            Name That Poem!
-            <small>Read a description and pick the poetry type</small>
-          </button>
-          <button class="mode-btn" onclick="startGame('rules')">
-            Rules Quiz
-            <small>Test your knowledge of syllables, rhymes, and rules</small>
-          </button>
-          <button class="mode-btn" onclick="startGame('match')">
-            Match the Example
-            <small>Read a poem and figure out what type it is</small>
-          </button>
-          <button class="mode-btn" onclick="startGame('elements')" style="background: linear-gradient(135deg, #e67e22, #e74c3c)">
-            Poetry Elements
-            <small>Rhyme scheme, imagery, repetition, and theme</small>
-          </button>
-          <button class="mode-btn" onclick="showStudy()" style="background: linear-gradient(135deg, #28a745, #20c997)">
-            Study Guide
-            <small>Review all 8 poetry types before you play</small>
-          </button>
-        </div>
-      </div>
-    `;
-  } else if (state.screen === "study") {
-    let cards = '<h3 style="margin-bottom:8px;color:#764ba2">Poetry Types</h3>';
-    for (const key of TYPES) {
-      const t = POETRY_TYPES[key];
-      cards += `
-        <div class="study-card">
-          <h3>${t.name}</h3>
-          <p>${t.rules}</p>
-          ${t.lines ? `<p><strong>Lines:</strong> ${t.lines}</p>` : ""}
-          ${t.syllables ? `<p><strong>Syllables:</strong> ${t.syllables}</p>` : ""}
-          ${t.rhyme && t.rhyme !== "none" ? `<p><strong>Rhyme:</strong> ${t.rhyme}</p>` : ""}
-          ${t.example ? `<div class="example">${t.example}</div>` : ""}
-        </div>
-      `;
-    }
-    cards += '<h3 style="margin:16px 0 8px;color:#e67e22">Poetry Elements</h3>';
-    for (const key of Object.keys(POETRY_ELEMENTS)) {
-      const e = POETRY_ELEMENTS[key];
-      cards += `
-        <div class="study-card" style="border-left:3px solid #e67e22">
-          <h3 style="color:#e67e22">${e.name}</h3>
-          <p>${e.definition}</p>
-          <div class="example">${e.example}</div>
-        </div>
-      `;
-    }
-    app.innerHTML = `
-      <div class="subtitle">Study all 8 poetry types</div>
-      <div class="card">${cards}</div>
-      <button class="next-btn show" onclick="state.screen='menu'; render()">Back to Menu</button>
-    `;
-  } else if (state.screen === "game") {
-    const q = state.questions[state.current];
-    const progress = ((state.current) / state.questions.length) * 100;
-    const starStr = Array(state.score).fill("\u2B50").join("");
-
-    let optionsHtml = "";
-    for (let i = 0; i < q.options.length; i++) {
-      optionsHtml += `<button class="option" data-idx="${i}">${q.options[i]}</button>`;
-    }
-
-    app.innerHTML = `
-      <div class="score-bar">
-        <div class="stars">${starStr || "No stars yet"}</div>
-        <div class="streak">${state.streak > 1 ? state.streak + "x streak!" : ""}</div>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
-      <div class="card">
-        <div class="question-num">Question ${state.current + 1} of ${state.questions.length}</div>
-        <div class="question">${q.question}</div>
-        ${q.poem ? `<div class="poem-example">${q.poem}</div>` : ""}
-        ${q.hint ? `<div class="hint">${q.hint}</div>` : ""}
-        <div class="options" id="options">${optionsHtml}</div>
-        <div class="feedback" id="feedback"></div>
-        <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
-      </div>
-    `;
-    document.getElementById("options").addEventListener("click", function(e) {
-      const btn = e.target.closest(".option");
-      if (!btn) return;
-      const idx = parseInt(btn.dataset.idx);
-      answer(state.questions[state.current].options[idx]);
-    });
-  } else if (state.screen === "results") {
-    const pct = Math.round((state.score / state.questions.length) * 100);
-    let msg, emoji;
-    if (pct === 100) { msg = "PERFECT SCORE! You're a poetry master, Victoria!"; emoji = "\uD83C\uDF1F\uD83D\uDC51\uD83C\uDF1F"; }
-    else if (pct >= 80) { msg = "Amazing job, Victoria! You really know your poetry!"; emoji = "\uD83C\uDF1F\u2B50\uD83C\uDF1F"; }
-    else if (pct >= 60) { msg = "Great work! Keep practicing and you'll be a pro!"; emoji = "\u2B50\u2B50"; }
-    else if (pct >= 40) { msg = "Good try! Check the study guide and try again!"; emoji = "\u2B50"; }
-    else { msg = "Keep learning! The study guide will help a lot!"; emoji = "\uD83D\uDCDA"; }
-
-    const badges = [];
-    if (pct === 100) badges.push("\uD83C\uDFC6 Perfect Score");
-    if (state.bestStreak >= 5) badges.push("\uD83D\uDD25 5+ Streak");
-    if (state.bestStreak >= 3) badges.push("\u26A1 Hot Streak");
-
-    app.innerHTML = `
-      <div class="card results">
-        <div class="big-stars">${emoji}</div>
-        <h2>Quest Complete!</h2>
-        <div class="score-text">${state.score} out of ${state.questions.length} correct (${pct}%)</div>
-        ${state.bestStreak >= 3 ? `<div class="score-text">Best streak: ${state.bestStreak}x</div>` : ""}
-        ${badges.length ? `<div style="margin:10px 0">${badges.map(b => `<span class="badge">${b}</span>`).join(" ")}</div>` : ""}
-        <div class="message">${msg}</div>
-        <button class="mode-btn" onclick="state.screen='menu'; render()">Play Again</button>
-      </div>
-    `;
+function renderMap(){
+  document.getElementById('gem-count').textContent=G.gems;
+  const el=document.getElementById('room-list');
+  el.innerHTML='';
+  for(const r of ROOMS){
+    const done=G.rooms[r.id]?.done;
+    const locked=!r.open&&!done;
+    const d=document.createElement('div');
+    d.className='room-card'+(locked?' locked':'')+(done?' completed':'');
+    d.innerHTML=`<div class="room-icon">${r.icon}</div><div class="room-info"><h3>${r.name}</h3><p>${locked?'\uD83D\uDD12 Coming soon!':r.desc}</p></div><div class="room-status">${done?'\u2705':locked?'\uD83D\uDD12':'\u27A1\uFE0F'}</div>`;
+    if(!locked)d.onclick=()=>go(r.id);
+    el.appendChild(d);
   }
 }
 
-function startGame(mode) {
-  state = {
-    screen: "game",
-    mode,
-    questions: generateQuestions(mode),
-    current: 0,
-    score: 0,
-    streak: 0,
-    bestStreak: 0,
-    answered: false,
-  };
-  render();
+// ===== KITCHEN =====
+function initK(){G.k={round:0,gems:0,lines:[[],[],[]],cur:0};document.getElementById('k-gems').textContent='0';renderK()}
+
+function renderK(){
+  const k=G.k, h=HAIKUS[k.round%HAIKUS.length];
+  k.lines=[[],[],[]];k.cur=0;
+  const dots=document.getElementById('k-dots');
+  dots.innerHTML='';
+  for(let i=0;i<HAIKUS.length;i++){const d=document.createElement('span');d.className='dot'+(i<k.round?' done':'')+(i===k.round?' current':'');dots.appendChild(d)}
+  const words=[...h.words].sort(()=>Math.random()-.5);
+  document.getElementById('k-area').innerHTML=`
+    <div class="game-card">
+      <h3>&#x1F375; Brew a Haiku!</h3>
+      <p style="font-size:.82em;opacity:.6;margin-bottom:6px">Tap words to build each line. Hit 5 - 7 - 5 syllables!</p>
+      <div class="cauldron">&#x1F9EA;<span class="steam">&#x2728;&#x2728;&#x2728;</span></div>
+      <div class="syl-bar">${[0,1,2].map(i=>`<div class="syl-box${i===0?' active':''}" id="sb${i}"><div class="n">0</div><div class="t">/ ${[5,7,5][i]}</div></div>`).join('')}</div>
+      <div class="haiku-display">${[0,1,2].map(i=>`<div class="h-line${i===0?' cur':''}" id="hl${i}">Line ${i+1}...</div>`).join('')}</div>
+      <div class="word-tray" id="wtray">${words.map((w,i)=>`<span class="chip" data-w="${w}" data-i="${i}" onclick="tapWord(this)">${w}</span>`).join('')}</div>
+      <button class="undo" onclick="undoK()">&#x21A9; Undo</button>
+    </div>
+    <button class="check-btn" id="k-check" onclick="checkK()" disabled>&#x2728; Check My Haiku!</button>
+    <div class="feedback" id="k-fb"></div>
+    <button class="next-btn" id="k-next" onclick="nextK()">Next Poem &#x2192;</button>`;
 }
 
-function showStudy() {
-  state.screen = "study";
-  render();
+function tapWord(chip){
+  const k=G.k;if(k.cur>2)return;
+  k.lines[k.cur].push(chip.dataset.w);
+  chip.classList.add('used');
+  updK();
+  if(lineSyl(k.lines[k.cur])>=[5,7,5][k.cur]){k.cur++;updK();if(k.cur>2)document.getElementById('k-check').disabled=false}
 }
 
-function answer(selected) {
-  if (state.answered) return;
-  state.answered = true;
-
-  const q = state.questions[state.current];
-  const correct = selected === q.answer;
-  const feedback = document.getElementById("feedback");
-  const nextBtn = document.getElementById("next-btn");
-  const options = document.querySelectorAll(".option");
-
-  if (correct) {
-    state.score++;
-    state.streak++;
-    if (state.streak > state.bestStreak) state.bestStreak = state.streak;
-    feedback.className = "feedback correct";
-    feedback.innerHTML = `\u2705 Correct!${state.streak > 1 ? ` <strong>${state.streak}x streak!</strong>` : ""}${q.explanation ? `<br><small>${q.explanation}</small>` : ""}`;
-  } else {
-    state.streak = 0;
-    feedback.className = "feedback wrong";
-    feedback.innerHTML = `\u274C The answer is <strong>${q.answer}</strong>.${q.explanation ? `<br><small>${q.explanation}</small>` : ""}`;
+function undoK(){
+  const k=G.k;
+  if(k.lines[k.cur]?.length===0&&k.cur>0)k.cur--;
+  if(k.lines[k.cur]?.length>0){
+    const w=k.lines[k.cur].pop();
+    document.querySelectorAll('.chip').forEach(c=>{if(c.dataset.w===w&&c.classList.contains('used')){c.classList.remove('used');return}});
+    document.getElementById('k-check').disabled=true;updK()
   }
+}
 
-  options.forEach(opt => {
-    opt.classList.add("disabled");
-    if (opt.textContent === q.answer) opt.classList.add(correct ? "correct" : "show-correct");
-    if (opt.textContent === selected && !correct) opt.classList.add("wrong");
+function updK(){
+  const k=G.k,tgt=[5,7,5];
+  for(let i=0;i<3;i++){
+    const el=document.getElementById('hl'+i),sb=document.getElementById('sb'+i);
+    const ws=k.lines[i],s=lineSyl(ws);
+    el.innerHTML=ws.length?ws.map(w=>`<span class="h-word">${w}</span>`).join(''):`Line ${i+1}...`;
+    el.className='h-line'+(i===k.cur?' cur':'');
+    sb.querySelector('.n').textContent=s;
+    sb.className='syl-box'+(s===tgt[i]?' ok':'')+(s>tgt[i]?' over':'')+(i===k.cur?' active':'');
+  }
+}
+
+function checkK(){
+  const k=G.k,fb=document.getElementById('k-fb'),tgt=[5,7,5];
+  const counts=[0,1,2].map(i=>lineSyl(k.lines[i]));
+  if(counts[0]===5&&counts[1]===7&&counts[2]===5){
+    k.gems+=5;G.gems+=5;save();
+    document.getElementById('k-gems').textContent=k.gems;
+    fb.className='feedback show ok';
+    fb.innerHTML=`<div>&#x2728; Perfect Haiku! +5 gems!</div><div class="small">${k.lines.map(l=>l.join(' ')).join(' / ')}</div>`;
+    document.getElementById('k-check').disabled=true;
+    document.getElementById('k-next').classList.add('show');
+  }else{
+    fb.className='feedback show no';
+    fb.innerHTML=`<div>Not quite! Your syllables: ${counts.join(' - ')}</div><div class="small">Target is 5 - 7 - 5. Try again!</div>`;
+    setTimeout(()=>{fb.className='feedback';renderK()},2500);
+  }
+}
+
+function nextK(){
+  G.k.round++;
+  document.getElementById('k-next').classList.remove('show');
+  document.getElementById('k-fb').className='feedback';
+  if(G.k.round>=HAIKUS.length){
+    G.rooms.kitchen={done:true};save();
+    document.getElementById('k-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F389;</div><h3>Kitchen Complete!</h3><p>You earned &#x1F48E; ${G.k.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;
+    return;
+  }
+  renderK();
+}
+
+// ===== PAINTER =====
+function initP(){G.p={round:0,gems:0,colors:[],sel:'A'};document.getElementById('p-gems').textContent='0';renderP()}
+
+function renderP(){
+  const p=G.p,poem=RHYMES[p.round%RHYMES.length];
+  p.colors=poem.lines.map(()=>null);p.sel='A';
+  const dots=document.getElementById('p-dots');
+  dots.innerHTML='';
+  for(let i=0;i<RHYMES.length;i++){const d=document.createElement('span');d.className='dot'+(i<p.round?' done':'')+(i===p.round?' current':'');dots.appendChild(d)}
+  document.getElementById('p-area').innerHTML=`
+    <div class="game-card">
+      <h3>&#x1F3A8; Paint the Rhyme Scheme!</h3>
+      <p style="font-size:.82em;opacity:.5;margin-bottom:4px">${poem.title}</p>
+      <p style="font-size:.8em;opacity:.5;margin-bottom:10px">${poem.hint}</p>
+      <p style="font-size:.82em;opacity:.6;margin-bottom:10px">Pick a color, then tap lines that rhyme together. Same color = same sound!</p>
+      <div class="palette">
+        <div class="paint pa sel" onclick="selC('A')">A</div>
+        <div class="paint pb" onclick="selC('B')">B</div>
+        <div class="paint pc" onclick="selC('C')">C</div>
+        <div class="paint pe" onclick="selC('X')">&#x232B;</div>
+      </div>
+      <div class="poem-lines">${poem.lines.map((l,i)=>`<div class="p-line" onclick="paintL(${i})"><span class="lbl" id="lb${i}">?</span><span>${l}</span></div>`).join('')}</div>
+    </div>
+    <button class="check-btn" id="p-check" onclick="checkP()">&#x2728; Check My Colors!</button>
+    <div class="feedback" id="p-fb"></div>
+    <button class="next-btn" id="p-next" onclick="nextP()">Next Poem &#x2192;</button>`;
+}
+
+function selC(c){
+  G.p.sel=c;
+  document.querySelectorAll('.paint').forEach(p=>p.classList.remove('sel'));
+  const cls={A:'.pa',B:'.pb',C:'.pc',X:'.pe'};
+  document.querySelector(cls[c])?.classList.add('sel');
+}
+
+function paintL(i){
+  const p=G.p,c=p.sel;
+  p.colors[i]=c==='X'?null:c;
+  const lb=document.getElementById('lb'+i),ln=lb.closest('.p-line');
+  lb.className='lbl';ln.className='p-line';
+  if(p.colors[i]){const x=p.colors[i].toLowerCase();lb.classList.add('l'+x);lb.textContent=p.colors[i];ln.classList.add('b'+x)}
+  else{lb.textContent='?'}
+}
+
+function normP(arr){const m={};let n=0;return arr.map(c=>{if(!(c in m))m[c]=n++;return m[c]}).join(',')}
+
+function checkP(){
+  const p=G.p,poem=RHYMES[p.round%RHYMES.length],fb=document.getElementById('p-fb');
+  if(p.colors.some(c=>c===null)){fb.className='feedback show no';fb.innerHTML='<div>Paint all lines first!</div>';setTimeout(()=>fb.className='feedback',1500);return}
+  if(normP(p.colors)===normP(poem.key)){
+    p.gems+=3;G.gems+=3;save();
+    document.getElementById('p-gems').textContent=p.gems;
+    fb.className='feedback show ok';
+    fb.innerHTML=`<div>&#x1F3A8; Perfect! It's ${poem.key.join('')}! +3 gems!</div>`;
+    document.getElementById('p-check').disabled=true;
+    document.getElementById('p-next').classList.add('show');
+  }else{
+    fb.className='feedback show no';
+    fb.innerHTML=`<div>Not quite!</div><div class="small">Lines with the same ending sound should be the same color. Listen to the last word of each line!</div>`;
+    setTimeout(()=>fb.className='feedback',3000);
+  }
+}
+
+function nextP(){
+  G.p.round++;
+  document.getElementById('p-next').classList.remove('show');
+  document.getElementById('p-fb').className='feedback';
+  if(G.p.round>=RHYMES.length){
+    G.rooms.painter={done:true};save();
+    document.getElementById('p-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F308;</div><h3>Painting Complete!</h3><p>You earned &#x1F48E; ${G.p.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;
+    return;
+  }
+  renderP();
+}
+
+// ===== IMAGERY DETECTIVE =====
+const IMG_PASSAGES=[
+  {text:"The golden sun melted into the purple horizon as crickets began their evening song. The cool breeze carried the sweet scent of jasmine through the garden.",
+   imagery:["golden","melted","purple","evening song","cool breeze","sweet scent","jasmine"],
+   imgWords:["golden","melted","purple","song","cool","breeze","sweet","scent","jasmine"]},
+  {text:"Her icy fingers gripped the warm mug as steam curled upward like tiny ghosts. Outside the frosty window the world was wrapped in a thick white blanket of snow.",
+   imagery:["icy","warm","steam curled","tiny ghosts","frosty","thick white blanket"],
+   imgWords:["icy","warm","steam","curled","ghosts","frosty","thick","white","blanket"]},
+  {text:"The old wooden door creaked open to reveal a dark dusty room. Cobwebs hung like silver curtains and the musty air tickled her nose.",
+   imagery:["creaked","dark","dusty","silver curtains","musty","tickled"],
+   imgWords:["creaked","dark","dusty","cobwebs","silver","curtains","musty","tickled"]},
+  {text:"Thunder rumbled across the sky like angry drums. The sharp crack of lightning lit up the trembling trees and rain hammered the roof with a thousand tiny fists.",
+   imagery:["rumbled","angry drums","sharp crack","lit up","trembling","hammered","thousand tiny fists"],
+   imgWords:["rumbled","angry","drums","sharp","crack","lit","trembling","hammered","thousand","tiny","fists"]},
+];
+
+function initD(){G.d={round:0,gems:0,found:0,total:0,checked:false};document.getElementById('d-gems').textContent='0';renderD()}
+
+function renderD(){
+  const d=G.d,pass=IMG_PASSAGES[d.round%IMG_PASSAGES.length];
+  d.found=0;d.checked=false;
+  d.total=pass.imgWords.length;
+  const dots=document.getElementById('d-dots');
+  dots.innerHTML='';
+  for(let i=0;i<IMG_PASSAGES.length;i++){const dt=document.createElement('span');dt.className='dot'+(i<d.round?' done':'')+(i===d.round?' current':'');dots.appendChild(dt)}
+
+  const words=pass.text.split(/\s+/);
+  const wordHtml=words.map((w,i)=>{
+    const clean=w.toLowerCase().replace(/[^a-z]/g,'');
+    const isImg=pass.imgWords.includes(clean);
+    return `<span class="passage-word" data-img="${isImg?1:0}" data-clean="${clean}" onclick="tapImg(this)">${w} </span>`;
+  }).join('');
+
+  document.getElementById('d-area').innerHTML=`
+    <div class="game-card">
+      <h3>&#x1F50D; Find the Imagery!</h3>
+      <p style="font-size:.82em;opacity:.6;margin-bottom:8px">Tap every word that creates a picture in your mind (senses: see, hear, feel, smell, taste)</p>
+      <div class="found-count" id="d-count">Found: 0 / ${d.total}</div>
+      <div class="passage" id="d-passage">${wordHtml}</div>
+    </div>
+    <button class="check-btn" id="d-check" onclick="checkD()">&#x2728; Check My Answers!</button>
+    <div class="feedback" id="d-fb"></div>
+    <button class="next-btn" id="d-next" onclick="nextD()">Next Passage &#x2192;</button>`;
+}
+
+function tapImg(el){
+  if(G.d.checked)return;
+  el.classList.toggle('selected');
+  const selected=document.querySelectorAll('.passage-word.selected').length;
+  document.getElementById('d-count').textContent=`Found: ${selected} / ${G.d.total}`;
+}
+
+function checkD(){
+  if(G.d.checked)return;
+  G.d.checked=true;
+  let correct=0,wrong=0,missed=0;
+  document.querySelectorAll('.passage-word').forEach(el=>{
+    const isImg=el.dataset.img==='1';
+    const isSel=el.classList.contains('selected');
+    el.classList.remove('selected');
+    if(isImg&&isSel){el.classList.add('correct');correct++}
+    else if(!isImg&&isSel){el.classList.add('wrong');wrong++}
+    else if(isImg&&!isSel){missed++;setTimeout(()=>el.classList.add('correct'),600)}
   });
-
-  nextBtn.classList.add("show");
-  nextBtn.textContent = state.current < state.questions.length - 1 ? "Next Question" : "See Results!";
+  const score=Math.max(0,correct-wrong);
+  const pct=Math.round((score/G.d.total)*100);
+  const earned=pct>=70?4:pct>=40?2:0;
+  G.d.gems+=earned;G.gems+=earned;save();
+  document.getElementById('d-gems').textContent=G.d.gems;
+  const fb=document.getElementById('d-fb');
+  if(pct>=70){fb.className='feedback show ok';fb.innerHTML=`<div>&#x1F50D; Great detective work! ${correct} found! +${earned} gems!</div><div class="small">${missed>0?missed+' missed, ':''}${wrong>0?wrong+' wrong guesses':''}</div>`}
+  else{fb.className='feedback show no';fb.innerHTML=`<div>Found ${correct}, missed ${missed}${wrong>0?', '+wrong+' wrong':''}.</div><div class="small">Imagery words are highlighted in green - study them!</div>`}
+  document.getElementById('d-check').disabled=true;
+  document.getElementById('d-next').classList.add('show');
 }
 
-function nextQuestion() {
-  state.current++;
-  state.answered = false;
-  if (state.current >= state.questions.length) {
-    state.screen = "results";
-  } else {
-    state.screen = "game";
+function nextD(){
+  G.d.round++;
+  document.getElementById('d-next').classList.remove('show');
+  document.getElementById('d-fb').className='feedback';
+  if(G.d.round>=IMG_PASSAGES.length){
+    G.rooms.detective={done:true};save();
+    document.getElementById('d-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F575;&#xFE0F;</div><h3>Detective Complete!</h3><p>You earned &#x1F48E; ${G.d.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;
+    return;
   }
-  render();
+  renderD();
 }
 
-render();
+// ===== DIAMOND FORGE =====
+const DIAMANTE_DATA=[
+  {line1:["Sun"],line2:["Bright","Warm","Golden","Fierce"],line3:["Shining","Glowing","Burning","Rising","Setting"],line4:["Light","Day","Stars","Night","Hope","Peace","Darkness","Calm"],line5:["Fading","Dimming","Cooling","Resting","Sleeping"],line6:["Quiet","Peaceful","Silver","Cold"],line7:["Moon"],
+   answer:{l1:"Sun",l2:["Bright","Warm"],l3:["Shining","Glowing","Burning"],l4:["Light","Day","Stars","Night"],l5:["Fading","Dimming","Cooling"],l6:["Quiet","Peaceful"],l7:"Moon"}},
+  {line1:["Summer"],line2:["Hot","Sunny","Lazy","Long"],line3:["Swimming","Playing","Running","Laughing","Melting"],line4:["Pool","Beach","Snow","Ice","Fun","Sun","Cold","Frost"],line5:["Freezing","Shivering","Bundling","Sledding","Snowing"],line6:["Chilly","Frosty","White","Short"],line7:["Winter"],
+   answer:{l1:"Summer",l2:["Hot","Sunny"],l3:["Swimming","Playing","Laughing"],l4:["Pool","Beach","Snow","Ice"],l5:["Freezing","Shivering","Bundling"],l6:["Chilly","Frosty"],l7:"Winter"}},
+  {line1:["Happy"],line2:["Joyful","Cheerful","Bright","Smiling"],line3:["Laughing","Dancing","Singing","Skipping","Hoping"],line4:["Smile","Joy","Tears","Pain","Hope","Love","Fear","Grief"],line5:["Crying","Hiding","Hurting","Frowning","Worrying"],line6:["Gloomy","Lonely","Dark","Blue"],line7:["Sad"],
+   answer:{l1:"Happy",l2:["Joyful","Cheerful"],l3:["Laughing","Dancing","Singing"],l4:["Smile","Joy","Tears","Pain"],l5:["Crying","Hiding","Hurting"],l6:["Gloomy","Lonely"],l7:"Sad"}},
+];
+
+function initF(){G.f={round:0,gems:0,curLine:0,slots:[[],[],[],[],[],[],[]]};document.getElementById('f-gems').textContent='0';renderF()}
+
+function renderF(){
+  const f=G.f,dia=DIAMANTE_DATA[f.round%DIAMANTE_DATA.length];
+  f.curLine=0;f.slots=[[],[],[],[],[],[],[]];
+  const dots=document.getElementById('f-dots');
+  dots.innerHTML='';
+  for(let i=0;i<DIAMANTE_DATA.length;i++){const d=document.createElement('span');d.className='dot'+(i<f.round?' done':'')+(i===f.round?' current':'');dots.appendChild(d)}
+
+  const lineInfo=[
+    {label:"Noun",count:1},{label:"Adjective, Adjective",count:2},{label:"Verb, Verb, Verb",count:3},
+    {label:"Noun, Noun, Noun, Noun",count:4},{label:"Verb, Verb, Verb",count:3},
+    {label:"Adjective, Adjective",count:2},{label:"Noun (opposite)",count:1}
+  ];
+  const allWords=[];
+  [dia.line1,dia.line2,dia.line3,dia.line4,dia.line5,dia.line6,dia.line7].forEach(arr=>arr.forEach(w=>{if(!allWords.includes(w))allWords.push(w)}));
+  const shuffled=allWords.sort(()=>Math.random()-.5);
+
+  document.getElementById('f-area').innerHTML=`
+    <div class="game-card">
+      <h3>&#x2666;&#xFE0F; Forge a Diamante!</h3>
+      <p style="font-size:.82em;opacity:.6;margin-bottom:8px">Build a diamond-shaped poem! Tap words to fill each line. The first and last words should be opposites!</p>
+      <div class="diamond-shape" id="f-diamond">
+        ${lineInfo.map((li,i)=>`<div class="d-line" id="fl${i}"><span class="d-label">${li.label}</span>${Array(li.count).fill(0).map((_,j)=>`<span class="d-slot" id="fs${i}_${j}">?</span>`).join('')}</div>`).join('')}
+      </div>
+      <p style="text-align:center;font-size:.8em;opacity:.5;margin:8px 0">Building line: <strong id="f-linenum">1</strong> of 7</p>
+      <div class="word-options" id="f-words">${shuffled.map(w=>`<span class="w-opt" onclick="forgeWord(this,'${w}')">${w}</span>`).join('')}</div>
+    </div>
+    <button class="check-btn" id="f-check" onclick="checkF()" disabled>&#x2728; Check My Diamond!</button>
+    <div class="feedback" id="f-fb"></div>
+    <button class="next-btn" id="f-next" onclick="nextF()">Next Diamond &#x2192;</button>`;
+}
+
+function forgeWord(el,word){
+  const f=G.f,counts=[1,2,3,4,3,2,1];
+  if(f.slots[f.curLine].length>=counts[f.curLine])return;
+  f.slots[f.curLine].push(word);
+  el.classList.add('picked');
+  const idx=f.slots[f.curLine].length-1;
+  const slot=document.getElementById(`fs${f.curLine}_${idx}`);
+  if(slot){slot.textContent=word;slot.classList.add('filled')}
+  if(f.slots[f.curLine].length>=counts[f.curLine]){
+    f.curLine++;
+    document.getElementById('f-linenum').textContent=Math.min(f.curLine+1,7);
+    if(f.curLine>=7)document.getElementById('f-check').disabled=false;
+  }
+}
+
+function checkF(){
+  const f=G.f,dia=DIAMANTE_DATA[f.round%DIAMANTE_DATA.length],fb=document.getElementById('f-fb');
+  // Check structure is filled and first/last words match expected
+  const first=f.slots[0][0],last=f.slots[6][0];
+  const ans=dia.answer;
+  const firstOk=first===ans.l1,lastOk=last===ans.l7;
+  // Give partial credit
+  let score=0;
+  if(firstOk)score+=2;if(lastOk)score+=2;
+  // Check middle lines have reasonable words
+  score+=Math.min(f.slots[1].length,2)+Math.min(f.slots[2].length,3)+Math.min(f.slots[3].length,4)+Math.min(f.slots[4].length,3)+Math.min(f.slots[5].length,2);
+  const earned=firstOk&&lastOk?5:score>=10?3:1;
+  G.f.gems+=earned;G.gems+=earned;save();
+  document.getElementById('f-gems').textContent=G.f.gems;
+  if(firstOk&&lastOk){
+    fb.className='feedback show ok';
+    fb.innerHTML=`<div>&#x2666;&#xFE0F; Beautiful diamond! ${ans.l1} to ${ans.l7}! +${earned} gems!</div>`;
+  }else{
+    fb.className='feedback show ok';
+    fb.innerHTML=`<div>Nice try! +${earned} gems!</div><div class="small">The opposites should be ${ans.l1} and ${ans.l7}.</div>`;
+  }
+  document.getElementById('f-check').disabled=true;
+  document.getElementById('f-next').classList.add('show');
+}
+
+function nextF(){
+  G.f.round++;
+  document.getElementById('f-next').classList.remove('show');
+  document.getElementById('f-fb').className='feedback';
+  if(G.f.round>=DIAMANTE_DATA.length){
+    G.rooms.forge={done:true};save();
+    document.getElementById('f-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F48E;</div><h3>Forge Complete!</h3><p>You earned &#x1F48E; ${G.f.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;
+    return;
+  }
+  renderF();
+}
+
+// ===== ELEMENT TOWER =====
+const EL_CHALLENGES=[
+  // Imagery: tap the imagery words
+  {type:'imagery-find',title:'Find the Imagery!',instruction:'Tap every word that helps you SEE, HEAR, FEEL, SMELL, or TASTE something.',
+   text:'The crackling fire warmed her icy fingers as the sweet smell of cinnamon filled the room.',
+   answers:['crackling','warmed','icy','sweet','smell','cinnamon']},
+  // Imagery: which is imagery?
+  {type:'pick',title:'Which is imagery?',q:'Which phrase helps you picture something using your senses?',
+   a:'"The golden sunlight dripped like honey"',opts:['"The golden sunlight dripped like honey"','"The poem has five lines"','"She went to the store"','"The answer is three"']},
+  // Repetition: find the repetition
+  {type:'pick',title:'Spot the Repetition!',q:'Which poem uses repetition?',
+   a:'"Stop, stop, stop!" cried the old man. "Stop, I say!"',opts:['"Stop, stop, stop!" cried the old man. "Stop, I say!"','"The cat sat on a mat near the bat."','"Roses are red, violets are blue."','"Five syllables here, seven more syllables now."']},
+  // Repetition: what is it?
+  {type:'pick',title:'What is Repetition?',q:'Repetition in poetry means:',
+   a:'Repeating words or phrases for effect',opts:['Repeating words or phrases for effect','Using words that rhyme','Writing about the same topic twice','Counting syllables in each line']},
+  // Theme: identify the theme
+  {type:'pick',title:'Find the Theme!',q:'A poem is about a kid who falls off a bike, gets back on, and finally learns to ride. What is the theme?',
+   a:'Never give up',opts:['Bikes are dangerous','Never give up','Kids should wear helmets','Riding is fun']},
+  // Theme: what is theme?
+  {type:'pick',title:'What is Theme?',q:'The theme of a poem is:',
+   a:'The lesson or message',opts:['The title','The rhyme pattern','The lesson or message','The number of lines']},
+  // Theme: another scenario
+  {type:'pick',title:'Find the Theme!',q:'A poem describes a girl who shares her lunch with a classmate who forgot theirs. They become best friends. What is the theme?',
+   a:'Kindness brings people together',opts:['Lunch is important','Kindness brings people together','Always bring extra food','School is fun']},
+  // Rhyme scheme: label it
+  {type:'rhyme-label',title:'Label the Rhyme Scheme!',
+   lines:['The cat in the hat (___)',  'Sat on the mat (___)', 'He ate some pie (___)', 'And started to cry (___)'],
+   answers:['A','A','B','B']},
+  // Rhyme scheme: what is it?
+  {type:'pick',title:'What is a Rhyme Scheme?',q:'A rhyme scheme is:',
+   a:'The pattern of rhyming lines',opts:['The pattern of rhyming lines','How many syllables per line','The topic of the poem','How loud you read the poem']},
+  // Rhyme scheme: identify
+  {type:'pick',title:'Name That Pattern!',q:'If lines 1 & 2 rhyme, and lines 3 & 4 rhyme, the scheme is:',
+   a:'AABB',opts:['ABAB','AABB','ABBA','ABCD']},
+  // Imagery: senses
+  {type:'pick',title:'Which Sense?',q:'"The salty ocean spray stung her lips" uses which sense?',
+   a:'Taste and touch',opts:['Sight','Sound','Taste and touch','Smell']},
+  // Mix: sort element type
+  {type:'pick',title:'Name That Element!',q:'"I can do it, I can do it, I know I can do it!" - This is an example of:',
+   a:'Repetition',opts:['Imagery','Repetition','Theme','Rhyme Scheme']},
+  // Imagery: another find
+  {type:'imagery-find',title:'Find the Imagery!',instruction:'Tap words that paint a picture!',
+   text:'The velvety petals of the crimson rose glistened with sparkling morning dew under the pale pink sky.',
+   answers:['velvety','crimson','glistened','sparkling','morning','dew','pale','pink']},
+  // Rhyme scheme: ABAB
+  {type:'rhyme-label',title:'Label the Rhyme Scheme!',
+   lines:['I saw a bird up in a tree (___)', 'It sang a song so sweet (___)', 'It looked right down at me (___)', 'Then flew off down the street (___)'],
+   answers:['A','B','A','B']},
+];
+
+function initEL(){G.el={round:0,gems:0};document.getElementById('el-gems').textContent='0';renderEL()}
+function renderEL(){
+  const el=G.el,ch=EL_CHALLENGES[el.round%EL_CHALLENGES.length];
+  const dots=document.getElementById('el-dots');dots.innerHTML='';
+  const total=Math.min(EL_CHALLENGES.length,12);
+  for(let i=0;i<total;i++){const d=document.createElement('span');d.className='dot'+(i<el.round?' done':'')+(i===el.round?' current':'');dots.appendChild(d)}
+
+  const area=document.getElementById('el-area');
+
+  if(ch.type==='pick'){
+    const opts=ch.opts.sort(()=>Math.random()-.5);
+    area.innerHTML=`<div class="game-card"><h3>&#x1F3F0; ${ch.title}</h3><p style="font-weight:600;margin-bottom:10px">${ch.q}</p>
+      <div class="mic-opts">${opts.map(o=>`<div class="mic-opt" onclick="elPick(this,'${o.replace(/'/g,"\\'")}')">${o}</div>`).join('')}</div></div>
+      <div class="feedback" id="el-fb"></div><button class="next-btn" id="el-next" onclick="nextEL()">Next Challenge &#x2192;</button>`;
+  }
+  else if(ch.type==='imagery-find'){
+    const words=ch.text.split(/\s+/);
+    const wordHtml=words.map(w=>{
+      const clean=w.toLowerCase().replace(/[^a-z]/g,'');
+      const isImg=ch.answers.includes(clean);
+      return `<span class="passage-word" data-img="${isImg?1:0}" onclick="this.classList.toggle('selected')">${w} </span>`;
+    }).join('');
+    area.innerHTML=`<div class="game-card"><h3>&#x1F3F0; ${ch.title}</h3><p style="font-size:.82em;opacity:.6;margin-bottom:8px">${ch.instruction}</p>
+      <div class="passage">${wordHtml}</div></div>
+      <button class="check-btn" onclick="checkELImg()">&#x2728; Check!</button>
+      <div class="feedback" id="el-fb"></div><button class="next-btn" id="el-next" onclick="nextEL()">Next Challenge &#x2192;</button>`;
+  }
+  else if(ch.type==='rhyme-label'){
+    const linesHtml=ch.lines.map((l,i)=>`<div style="display:flex;align-items:center;gap:8px;margin:6px 0">
+      <span style="flex:1">${l}</span>
+      <select id="rl${i}" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px;font-family:'Quicksand',sans-serif;min-height:40px">
+        <option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option>
+      </select></div>`).join('');
+    area.innerHTML=`<div class="game-card"><h3>&#x1F3F0; ${ch.title}</h3><p style="font-size:.82em;opacity:.6;margin-bottom:8px">Fill in the rhyme scheme letter for each line!</p>
+      ${linesHtml}</div>
+      <button class="check-btn" onclick="checkELRhyme()">&#x2728; Check!</button>
+      <div class="feedback" id="el-fb"></div><button class="next-btn" id="el-next" onclick="nextEL()">Next Challenge &#x2192;</button>`;
+  }
+}
+
+function elPick(el,ans){
+  const ch=EL_CHALLENGES[G.el.round%EL_CHALLENGES.length],fb=document.getElementById('el-fb');
+  document.querySelectorAll('.mic-opt').forEach(o=>o.classList.add('dis'));
+  if(ans===ch.a){el.classList.add('right');G.el.gems+=3;G.gems+=3;save();document.getElementById('el-gems').textContent=G.el.gems;
+    fb.className='feedback show ok';fb.innerHTML='<div>&#x2705; Correct! +3 gems!</div>'}
+  else{el.classList.add('nope');document.querySelectorAll('.mic-opt').forEach(o=>{if(o.textContent===ch.a)o.classList.add('show-right')});
+    fb.className='feedback show no';fb.innerHTML=`<div>The answer is: ${ch.a}</div>`}
+  document.getElementById('el-next').classList.add('show');
+}
+
+function checkELImg(){
+  const ch=EL_CHALLENGES[G.el.round%EL_CHALLENGES.length],fb=document.getElementById('el-fb');
+  let correct=0,wrong=0,missed=0;
+  document.querySelectorAll('.passage-word').forEach(el=>{
+    const isImg=el.dataset.img==='1',isSel=el.classList.contains('selected');
+    el.classList.remove('selected');
+    if(isImg&&isSel){el.classList.add('correct');correct++}
+    else if(!isImg&&isSel){el.classList.add('wrong');wrong++}
+    else if(isImg){missed++;setTimeout(()=>el.classList.add('correct'),500)}
+  });
+  const earned=correct>=ch.answers.length/2?3:1;
+  G.el.gems+=earned;G.gems+=earned;save();document.getElementById('el-gems').textContent=G.el.gems;
+  fb.className=correct>=ch.answers.length/2?'feedback show ok':'feedback show no';
+  fb.innerHTML=`<div>${correct} found${missed>0?', '+missed+' missed':''}${wrong>0?', '+wrong+' wrong':''}. +${earned} gems!</div>`;
+  document.getElementById('el-next').classList.add('show');
+}
+
+function checkELRhyme(){
+  const ch=EL_CHALLENGES[G.el.round%EL_CHALLENGES.length],fb=document.getElementById('el-fb');
+  const guesses=ch.answers.map((_,i)=>document.getElementById('rl'+i).value);
+  if(guesses.some(g=>!g)){fb.className='feedback show no';fb.innerHTML='<div>Fill in all the letters!</div>';setTimeout(()=>fb.className='feedback',1500);return}
+  // Normalize pattern
+  const norm=arr=>{const m={};let n=0;return arr.map(c=>{if(!(c in m))m[c]=n++;return m[c]}).join(',')};
+  if(norm(guesses)===norm(ch.answers)){
+    G.el.gems+=4;G.gems+=4;save();document.getElementById('el-gems').textContent=G.el.gems;
+    fb.className='feedback show ok';fb.innerHTML=`<div>&#x2705; ${ch.answers.join('')}! +4 gems!</div>`}
+  else{fb.className='feedback show no';fb.innerHTML=`<div>Not quite! The pattern is ${ch.answers.join('')}.</div>`}
+  document.getElementById('el-next').classList.add('show');
+}
+
+function nextEL(){
+  G.el.round++;document.getElementById('el-next').classList.remove('show');document.getElementById('el-fb').className='feedback';
+  const total=Math.min(EL_CHALLENGES.length,12);
+  if(G.el.round>=total){G.rooms.elements={done:true};save();document.getElementById('el-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F3F0;</div><h3>Element Tower Complete!</h3><p>&#x1F48E; ${G.el.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;return}
+  renderEL();
+}
+
+// ===== POETRY DRAGON =====
+const DRAGON_QS=[
+  // Definition questions (like Part 1 of test)
+  {q:"What is an acrostic poem?",a:"First letters spell a word",opts:["First letters spell a word","5 lines that rhyme","A funny poem","A poem with no rules"]},
+  {q:"Which pattern is used in a haiku?",a:"5-7-5",opts:["7-7-7","5-7-5","2-4-6-8-2","AABBA"]},
+  {q:"What type of poem is funny and follows AABBA?",a:"Limerick",opts:["Haiku","Limerick","Sonnet","Free Verse"]},
+  {q:"Which poem has NO rules?",a:"Free Verse",opts:["Free Verse","Sonnet","Cinquain","Diamante"]},
+  {q:"How many lines in a sonnet?",a:"14",opts:["5","7","10","14"]},
+  // Matching questions (like Part 2)
+  {q:"Two rhyming lines describes a:",a:"Couplet",opts:["Haiku","Couplet","Sonnet","Limerick"]},
+  {q:"5 lines with 2-4-6-8-2 syllables describes a:",a:"Cinquain",opts:["Cinquain","Haiku","Limerick","Diamante"]},
+  {q:"3 lines with 5-7-5 syllables describes a:",a:"Haiku",opts:["Haiku","Cinquain","Couplet","Limerick"]},
+  {q:"7 lines shaped like a diamond describes a:",a:"Diamante",opts:["Sonnet","Diamante","Cinquain","Acrostic"]},
+  // Identify questions (like Part 3)
+  {q:"Little brown puppy / Running fast across the yard / Chasing butterflies - What type?",a:"Haiku",opts:["Limerick","Couplet","Haiku","Free Verse"]},
+  {q:"The sun is bright / It gives us light - What type?",a:"Couplet",opts:["Haiku","Couplet","Sonnet","Acrostic"]},
+  // Elements questions (like Part 4)
+  {q:"'Feathered wings' is an example of:",a:"Imagery",opts:["Repetition","Theme","Imagery","Rhyme Scheme"]},
+  {q:"Repeating words or phrases is called:",a:"Repetition",opts:["Imagery","Repetition","Theme","Rhyme Scheme"]},
+  {q:"The lesson or message of a poem is the:",a:"Theme",opts:["Rhyme Scheme","Imagery","Repetition","Theme"]},
+  {q:"ABAB means:",a:"Every other line rhymes",opts:["First two lines rhyme","Every other line rhymes","Nothing rhymes","All lines rhyme"]},
+  {q:"In a diamante, the first and last words are:",a:"Opposites",opts:["The same word","Rhyming words","Opposites","Verbs"]},
+  {q:"A haiku comes from which tradition?",a:"Japanese",opts:["French","Japanese","English","Italian"]},
+  {q:"What is the syllable pattern of a cinquain?",a:"2-4-6-8-2",opts:["5-7-5","2-4-6-8-2","1-2-3-4-5","7-7-7-7-7"]},
+  {q:"In an acrostic, the first letters spell:",a:"A word or phrase",opts:["Nothing","A number","A word or phrase","The poet's name"]},
+  {q:"How many lines does a diamante have?",a:"7",opts:["5","6","7","14"]},
+];
+
+function initB(){G.b={gems:0,dragonHp:100,princessHp:100,qIdx:0,qs:DRAGON_QS.sort(()=>Math.random()-.5).slice(0,10),done:false};document.getElementById('b-gems').textContent='0';renderB()}
+
+function renderB(){
+  const b=G.b;
+  if(b.done)return;
+  if(b.dragonHp<=0){
+    b.done=true;const earned=10;b.gems+=earned;G.gems+=earned;G.rooms.dragon={done:true};save();
+    document.getElementById('b-gems').textContent=b.gems;
+    document.getElementById('b-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F451;&#x1F389;&#x1F451;</div><h3>You defeated the Poetry Dragon!</h3><p style="margin:8px 0">Princess Victoria saves the castle!</p><p>You earned &#x1F48E; ${b.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;
+    return;
+  }
+  if(b.princessHp<=0||b.qIdx>=b.qs.length){
+    b.done=true;G.gems+=b.gems;save();
+    document.getElementById('b-gems').textContent=b.gems;
+    document.getElementById('b-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F4AA;</div><h3>The dragon was too strong this time!</h3><p style="margin:8px 0">You earned &#x1F48E; ${b.gems} gems. Study up and try again!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;
+    return;
+  }
+
+  const q=b.qs[b.qIdx];
+  const opts=q.opts.sort(()=>Math.random()-.5);
+
+  document.getElementById('b-area').innerHTML=`
+    <div class="dragon-arena">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px">
+        <div style="text-align:center"><div style="font-size:2em">&#x1F478;</div><div style="font-size:.7em;opacity:.7">Victoria</div></div>
+        <div style="font-size:.9em;opacity:.5">VS</div>
+        <div style="text-align:center"><div style="font-size:2em" id="dragon-face">&#x1F409;</div><div style="font-size:.7em;opacity:.7">Poetry Dragon</div></div>
+      </div>
+      <div class="hp-bar hp-princess"><div class="hp-fill" style="width:${b.princessHp}%"></div><span class="hp-label">&#x1F478; ${b.princessHp}%</span></div>
+      <div class="hp-bar hp-dragon"><div class="hp-fill" style="width:${b.dragonHp}%"></div><span class="hp-label">&#x1F409; ${b.dragonHp}%</span></div>
+      <div class="battle-q">
+        <div style="font-size:.8em;opacity:.5;margin-bottom:6px">Question ${b.qIdx+1} of ${b.qs.length}</div>
+        <div style="font-weight:700;margin-bottom:10px;font-size:1.05em">${q.q}</div>
+        <div class="battle-opts">${opts.map(o=>`<div class="b-opt" onclick="battleAnswer(this,'${o.replace(/'/g,"\\'")}')">${o}</div>`).join('')}</div>
+      </div>
+    </div>`;
+}
+
+function battleAnswer(el,ans){
+  const b=G.b,q=b.qs[b.qIdx];
+  const correct=ans===q.a;
+  document.querySelectorAll('.b-opt').forEach(o=>o.classList.add('dis'));
+  const dragon=document.getElementById('dragon-face');
+
+  if(correct){
+    el.classList.add('right');
+    b.dragonHp-=20;b.gems+=2;
+    dragon.classList.add('hit');
+    showSpell('\u2728\u26A1\u2728');
+    document.getElementById('b-gems').textContent=b.gems;
+  }else{
+    el.classList.add('nope');
+    b.princessHp-=20;
+    dragon.classList.add('attack');
+    showSpell('\uD83D\uDD25');
+    // Show correct
+    document.querySelectorAll('.b-opt').forEach(o=>{if(o.textContent===q.a)o.classList.add('right')});
+  }
+
+  b.qIdx++;
+  setTimeout(()=>renderB(),1500);
+}
+
+function showSpell(emoji){
+  const el=document.createElement('div');
+  el.className='spell-effect';el.textContent=emoji;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),800);
+}
+
+// ===== REPAIR SHOP =====
+const REPAIRS=[
+  {type:"Haiku",poem:["Cherry blossoms fall (5)","Gently floating to the ground so soft (9)","Spring has arrived (4)"],broken:1,fix:["Dancing in the wind softly","Gently down to the soft ground","Floating to the ground below"],answer:"Gently down to the soft ground",why:"Line 2 needs 7 syllables. 'Gently down to the soft ground' = 7."},
+  {type:"Limerick",poem:["There once was a girl from the shore,","Who wanted to learn how to soar,","She flapped her small wings,","And hummed happy things,","And fell on the (___) floor."],broken:4,fix:["sandy","cold and wet","kitchen"],answer:"sandy",why:"The last line must rhyme with 'shore' and 'soar'. 'Sandy floor' keeps the AABBA scheme."},
+  {type:"Couplet",poem:["The stars shine bright above the sea,","The waves crash loud for you and (___)."],broken:1,fix:["me","them","her"],answer:"me",why:"A couplet's two lines must rhyme. 'Sea' and 'me' rhyme!"},
+  {type:"Haiku",poem:["The bright moon glows (4)","Shining over still waters (7)","Stars twinkle and shine brightly (8)"],broken:2,fix:["Stars dance in the sky","Stars twinkle above","Twinkling star light shines so bright"],answer:"Stars dance in the sky",why:"Line 3 needs 5 syllables. 'Stars dance in the sky' = 5."},
+];
+
+function initR(){G.r={round:0,gems:0};document.getElementById('r-gems').textContent='0';renderR()}
+function renderR(){
+  const r=G.r,rep=REPAIRS[r.round%REPAIRS.length];
+  const dots=document.getElementById('r-dots');dots.innerHTML='';
+  for(let i=0;i<REPAIRS.length;i++){const d=document.createElement('span');d.className='dot'+(i<r.round?' done':'')+(i===r.round?' current':'');dots.appendChild(d)}
+  const poemHtml=rep.poem.map((line,i)=>{
+    if(i===rep.broken)return`<div class="fix-line"><span class="fix-tag">BROKEN</span><select id="fix-sel">${rep.fix.map(f=>`<option value="${f}">${f}</option>`).join('')}</select></div>`;
+    return`<div style="padding:4px 0">${line}</div>`;
+  }).join('');
+  document.getElementById('r-area').innerHTML=`
+    <div class="game-card"><h3>&#x1F527; Fix the ${rep.type}!</h3><p style="font-size:.82em;opacity:.6;margin-bottom:8px">One line is broken. Pick the best replacement!</p>
+    <div class="broken-poem">${poemHtml}</div></div>
+    <button class="check-btn" onclick="checkR()">&#x2728; Check Fix!</button>
+    <div class="feedback" id="r-fb"></div><button class="next-btn" id="r-next" onclick="nextR()">Next Fix &#x2192;</button>`;
+}
+function checkR(){
+  const r=G.r,rep=REPAIRS[r.round%REPAIRS.length],fb=document.getElementById('r-fb');
+  const sel=document.getElementById('fix-sel').value;
+  if(sel===rep.answer){r.gems+=4;G.gems+=4;save();document.getElementById('r-gems').textContent=r.gems;fb.className='feedback show ok';fb.innerHTML=`<div>&#x1F527; Fixed! +4 gems!</div><div class="small">${rep.why}</div>`}
+  else{fb.className='feedback show no';fb.innerHTML=`<div>Not quite!</div><div class="small">${rep.why}</div>`}
+  document.getElementById('r-next').classList.add('show');
+}
+function nextR(){G.r.round++;document.getElementById('r-next').classList.remove('show');document.getElementById('r-fb').className='feedback';
+  if(G.r.round>=REPAIRS.length){G.rooms.repair={done:true};save();document.getElementById('r-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F527;</div><h3>Repair Shop Complete!</h3><p>&#x1F48E; ${G.r.gems} gems earned!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;return}renderR()}
+
+// ===== MIC DROP (Couplet) =====
+const MIC_DATA=[
+  {line1:"The stars shine bright above the sea,",opts:["The waves crash loud for you and me.","The sun is hot in summer time.","I like to read a book at night.","The dog ran fast around the tree."],answer:"The waves crash loud for you and me."},
+  {line1:"I found a shell upon the shore,",opts:["I picked it up and wanted more.","The sky was blue and very wide.","My cat likes sleeping on the bed.","Tomorrow is another chance."],answer:"I picked it up and wanted more."},
+  {line1:"The rain comes down and fills the stream,",opts:["And makes the flowers grow and gleam.","The sun was shining all day long.","I had a sandwich for my lunch.","The bird was sitting in a tree."],answer:"And makes the flowers grow and gleam."},
+  {line1:"A butterfly with wings of gold,",opts:["Flew through the garden, brave and bold.","Was eating leaves upon the ground.","The weather forecast said it's warm.","I need to study for my test."],answer:"Flew through the garden, brave and bold."},
+  {line1:"The snow falls gently, soft and white,",opts:["It covers everything in sight.","The summer sun is very hot.","I went to school and learned a lot.","My favorite color is bright blue."],answer:"It covers everything in sight."},
+];
+
+function initM(){G.m={round:0,gems:0};document.getElementById('m-gems').textContent='0';renderM()}
+function renderM(){
+  const m=G.m,mic=MIC_DATA[m.round%MIC_DATA.length];
+  const dots=document.getElementById('m-dots');dots.innerHTML='';
+  for(let i=0;i<MIC_DATA.length;i++){const d=document.createElement('span');d.className='dot'+(i<m.round?' done':'')+(i===m.round?' current':'');dots.appendChild(d)}
+  const opts=mic.opts.sort(()=>Math.random()-.5);
+  document.getElementById('m-area').innerHTML=`
+    <div class="game-card"><h3>&#x1F3A4; Drop the Mic!</h3><p style="font-size:.82em;opacity:.6;margin-bottom:8px">Pick the line that rhymes to complete the couplet!</p>
+    <div class="mic-emoji">&#x1F3A4;</div>
+    <div class="mic-line">${mic.line1}</div>
+    <div class="mic-opts">${opts.map(o=>`<div class="mic-opt" onclick="micAnswer(this,'${o.replace(/'/g,"\\'")}')">${o}</div>`).join('')}</div></div>
+    <div class="feedback" id="m-fb"></div><button class="next-btn" id="m-next" onclick="nextM()">Next Couplet &#x2192;</button>`;
+}
+function micAnswer(el,ans){
+  const m=G.m,mic=MIC_DATA[m.round%MIC_DATA.length];
+  document.querySelectorAll('.mic-opt').forEach(o=>o.classList.add('dis'));
+  if(ans===mic.answer){el.classList.add('right');m.gems+=3;G.gems+=3;save();document.getElementById('m-gems').textContent=m.gems;
+    document.getElementById('m-fb').className='feedback show ok';document.getElementById('m-fb').innerHTML='<div>&#x1F3A4; MIC DROP! +3 gems!</div>'}
+  else{el.classList.add('nope');document.querySelectorAll('.mic-opt').forEach(o=>{if(o.textContent===mic.answer)o.classList.add('show-right')});
+    document.getElementById('m-fb').className='feedback show no';document.getElementById('m-fb').innerHTML='<div>The rhyming line is highlighted!</div>'}
+  document.getElementById('m-next').classList.add('show');
+}
+function nextM(){G.m.round++;document.getElementById('m-next').classList.remove('show');document.getElementById('m-fb').className='feedback';
+  if(G.m.round>=MIC_DATA.length){G.rooms.mic={done:true};save();document.getElementById('m-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F3A4;</div><h3>Mic Drop Complete!</h3><p>&#x1F48E; ${G.m.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;return}renderM()}
+
+// ===== ACROSTIC DECODER =====
+const ACROSTIC_DATA=[
+  {lines:["Sunshine warms the day","Tall trees sway in wind","Always reaching high","Running through the fields"],answer:"STAR"},
+  {lines:["Hopping through the grass","Over logs and stones","Puddles everywhere","Enjoying every step"],answer:"HOPE"},
+  {lines:["Laughing with my friends","Over hills we run","Very fast and free","Endless summer days"],answer:"LOVE"},
+  {lines:["Dancing in the rain","Raindrops on my face","Every drop a gift","And the sky clears up","Making rainbows shine"],answer:"DREAM"},
+];
+
+function initAC(){G.ac={round:0,gems:0};document.getElementById('ac-gems').textContent='0';renderAC()}
+function renderAC(){
+  const ac=G.ac,poem=ACROSTIC_DATA[ac.round%ACROSTIC_DATA.length];
+  const dots=document.getElementById('ac-dots');dots.innerHTML='';
+  for(let i=0;i<ACROSTIC_DATA.length;i++){const d=document.createElement('span');d.className='dot'+(i<ac.round?' done':'')+(i===ac.round?' current':'');dots.appendChild(d)}
+  const poemHtml=poem.lines.map(l=>`<div class="acrostic-line"><span class="first-letter">${l[0]}</span>${l.slice(1)}</div>`).join('');
+  document.getElementById('ac-area').innerHTML=`
+    <div class="game-card"><h3>&#x1F510; Crack the Code!</h3><p style="font-size:.82em;opacity:.6;margin-bottom:8px">Look at the FIRST letter of each line. What word do they spell?</p>
+    <div class="acrostic-display">${poemHtml}</div>
+    <div class="decode-input"><input type="text" id="ac-input" placeholder="type the word" maxlength="${poem.answer.length}" autocomplete="off" autocapitalize="characters"></div></div>
+    <button class="check-btn" onclick="checkAC()">&#x2728; Decode!</button>
+    <div class="feedback" id="ac-fb"></div><button class="next-btn" id="ac-next" onclick="nextAC()">Next Code &#x2192;</button>`;
+}
+function checkAC(){
+  const ac=G.ac,poem=ACROSTIC_DATA[ac.round%ACROSTIC_DATA.length],fb=document.getElementById('ac-fb');
+  const guess=document.getElementById('ac-input').value.trim().toUpperCase();
+  if(guess===poem.answer){ac.gems+=4;G.gems+=4;save();document.getElementById('ac-gems').textContent=ac.gems;fb.className='feedback show ok';fb.innerHTML=`<div>&#x1F510; Decoded! The word is ${poem.answer}! +4 gems!</div>`}
+  else{fb.className='feedback show no';fb.innerHTML=`<div>Not quite! The first letters spell: ${poem.answer}</div>`}
+  document.getElementById('ac-next').classList.add('show');
+}
+function nextAC(){G.ac.round++;document.getElementById('ac-next').classList.remove('show');document.getElementById('ac-fb').className='feedback';
+  if(G.ac.round>=ACROSTIC_DATA.length){G.rooms.decoder={done:true};save();document.getElementById('ac-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F510;</div><h3>Decoder Complete!</h3><p>&#x1F48E; ${G.ac.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;return}renderAC()}
+
+// ===== CINQUAIN COUNTER =====
+const CINQUAIN_DATA=[
+  {lines:["Nightfall","Shadows creeping","Silently darkness falls","The moon rises up to light the way","New night"],target:[2,4,6,8,2]},
+  {lines:["Kittens","Soft and fluffy","Playing with a yarn ball","They tumble and roll across the floor","So cute"],target:[2,4,6,8,2]},
+  {lines:["Springtime","Flowers blooming","Butterflies are dancing","The world comes alive with colors bright","Sunshine"],target:[2,4,6,8,2]},
+];
+
+function initCC(){G.cc={round:0,gems:0};document.getElementById('cc-gems').textContent='0';renderCC()}
+function renderCC(){
+  const cc=G.cc,cinq=CINQUAIN_DATA[cc.round%CINQUAIN_DATA.length];
+  const dots=document.getElementById('cc-dots');dots.innerHTML='';
+  for(let i=0;i<CINQUAIN_DATA.length;i++){const d=document.createElement('span');d.className='dot'+(i<cc.round?' done':'')+(i===cc.round?' current':'');dots.appendChild(d)}
+  const linesHtml=cinq.lines.map((l,i)=>`
+    <div class="count-line" id="cl${i}">
+      <span class="poem-text">${l}</span>
+      <div class="count-btns">
+        <button class="count-btn" onclick="adjCount(${i},-1)">-</button>
+        <span class="count-val" id="cv${i}">0</span>
+        <button class="count-btn" onclick="adjCount(${i},1)">+</button>
+      </div>
+      <div class="count-target">need ${cinq.target[i]}</div>
+    </div>`).join('');
+  document.getElementById('cc-area').innerHTML=`
+    <div class="game-card"><h3>&#x1F522; Count the Syllables!</h3><p style="font-size:.82em;opacity:.6;margin-bottom:8px">Use + and - to set the syllable count for each line. Cinquains follow 2-4-6-8-2!</p>
+    ${linesHtml}</div>
+    <button class="check-btn" onclick="checkCC()">&#x2728; Check Counts!</button>
+    <div class="feedback" id="cc-fb"></div><button class="next-btn" id="cc-next" onclick="nextCC()">Next Cinquain &#x2192;</button>`;
+  G.cc.counts=[0,0,0,0,0];
+}
+function adjCount(i,delta){
+  G.cc.counts[i]=Math.max(0,Math.min(15,(G.cc.counts[i]||0)+delta));
+  document.getElementById('cv'+i).textContent=G.cc.counts[i];
+}
+function checkCC(){
+  const cc=G.cc,cinq=CINQUAIN_DATA[cc.round%CINQUAIN_DATA.length],fb=document.getElementById('cc-fb');
+  let correct=0;
+  for(let i=0;i<5;i++){
+    const el=document.getElementById('cl'+i);
+    if(cc.counts[i]===cinq.target[i]){el.classList.add('right');correct++}
+    else{el.classList.add('wrong')}
+  }
+  if(correct===5){cc.gems+=5;G.gems+=5;save();document.getElementById('cc-gems').textContent=cc.gems;fb.className='feedback show ok';fb.innerHTML='<div>&#x1F522; Perfect count! 2-4-6-8-2! +5 gems!</div>'}
+  else{fb.className='feedback show no';fb.innerHTML=`<div>${correct}/5 correct. The pattern is ${cinq.target.join('-')}!</div>`}
+  document.getElementById('cc-next').classList.add('show');
+}
+function nextCC(){G.cc.round++;document.getElementById('cc-next').classList.remove('show');document.getElementById('cc-fb').className='feedback';
+  if(G.cc.round>=CINQUAIN_DATA.length){G.rooms.counter={done:true};save();document.getElementById('cc-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F522;</div><h3>Counter Complete!</h3><p>&#x1F48E; ${G.cc.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;return}renderCC()}
+
+// ===== LIMERICK LAB =====
+const LIMERICK_DATA=[
+  {lines:["There once was a cat from Peru,","Who dreamed he could fly like a shoe,","He jumped in the air,","And landed with flair,"],blank:"But now he says flying is ___.",opts:["through","done","blue","new"],answer:"through",why:"'Through' rhymes with 'Peru' and 'shoe' (AABBA scheme)."},
+  {lines:["A dragon who lived in a cave,","Decided he wanted to shave,","He picked up a blade,","A mess that he made,"],blank:"Now his chin is all smooth and so ___.",opts:["brave","clean","red","shiny"],answer:"brave",why:"'Brave' rhymes with 'cave' and 'shave' (AABBA scheme)."},
+  {lines:["There once was a frog on a log,","Who wanted to dance with a dog,","They jumped and they spun,","And had so much fun,"],blank:"Then they both fell into the ___.",opts:["bog","lake","mud","pond"],answer:"bog",why:"'Bog' rhymes with 'log' and 'dog' (AABBA scheme)."},
+  {lines:["A princess who lived in a tower,","Had magical glittery power,","She waved her small hand,","And all through the land,"],blank:"The trees burst with every ___.",opts:["flower","leaf","color","star"],answer:"flower",why:"'Flower' rhymes with 'tower' and 'power' (AABBA scheme)."},
+];
+
+function initLL(){G.ll={round:0,gems:0};document.getElementById('ll-gems').textContent='0';renderLL()}
+function renderLL(){
+  const ll=G.ll,lim=LIMERICK_DATA[ll.round%LIMERICK_DATA.length];
+  const dots=document.getElementById('ll-dots');dots.innerHTML='';
+  for(let i=0;i<LIMERICK_DATA.length;i++){const d=document.createElement('span');d.className='dot'+(i<ll.round?' done':'')+(i===ll.round?' current':'');dots.appendChild(d)}
+  const poemHtml=lim.lines.map(l=>`<div>${l}</div>`).join('')+`<div>${lim.blank.replace('___','<span class="blank-line">???</span>')}</div>`;
+  const opts=lim.opts.sort(()=>Math.random()-.5);
+  document.getElementById('ll-area').innerHTML=`
+    <div class="game-card"><h3>&#x1F923; Finish the Limerick!</h3><p style="font-size:.82em;opacity:.6;margin-bottom:8px">Pick the word that rhymes with lines 1 and 2!</p>
+    <div class="limerick-display">${poemHtml}</div>
+    <div class="mic-opts">${opts.map(o=>`<div class="mic-opt" onclick="limAnswer(this,'${o}')">${o}</div>`).join('')}</div></div>
+    <div class="feedback" id="ll-fb"></div><button class="next-btn" id="ll-next" onclick="nextLL()">Next Limerick &#x2192;</button>`;
+}
+function limAnswer(el,ans){
+  const ll=G.ll,lim=LIMERICK_DATA[ll.round%LIMERICK_DATA.length];
+  document.querySelectorAll('.mic-opt').forEach(o=>o.classList.add('dis'));
+  if(ans===lim.answer){el.classList.add('right');ll.gems+=4;G.gems+=4;save();document.getElementById('ll-gems').textContent=ll.gems;
+    document.getElementById('ll-fb').className='feedback show ok';document.getElementById('ll-fb').innerHTML=`<div>&#x1F923; Ha! Perfect! +4 gems!</div><div class="small">${lim.why}</div>`}
+  else{el.classList.add('nope');document.querySelectorAll('.mic-opt').forEach(o=>{if(o.textContent===lim.answer)o.classList.add('show-right')});
+    document.getElementById('ll-fb').className='feedback show no';document.getElementById('ll-fb').innerHTML=`<div>Not quite!</div><div class="small">${lim.why}</div>`}
+  document.getElementById('ll-next').classList.add('show');
+}
+function nextLL(){G.ll.round++;document.getElementById('ll-next').classList.remove('show');document.getElementById('ll-fb').className='feedback';
+  if(G.ll.round>=LIMERICK_DATA.length){G.rooms.limerick={done:true};save();document.getElementById('ll-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F923;</div><h3>Limerick Lab Complete!</h3><p>&#x1F48E; ${G.ll.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;return}renderLL()}
+
+// ===== PRACTICE TEST =====
+function initTest(){
+  const area=document.getElementById('test-area');
+  area.innerHTML=`
+  <div class="game-card" style="max-width:560px;margin:0 auto">
+    <h3 style="text-align:center;font-size:1.3em">&#x1F4DD; Poetry Practice Test</h3>
+    <p style="text-align:center;font-size:.85em;opacity:.6;margin-bottom:16px">Just like the real test! Answer all questions, then check your score.</p>
+
+    <h3>Part 1: Multiple Choice</h3>
+    <div class="test-q">1. What is an acrostic poem?<br>
+      <label><input type="radio" name="t1" value="a"> A. A poem with 5 lines that rhyme</label><br>
+      <label><input type="radio" name="t1" value="b"> B. A poem where the first letters spell a word</label><br>
+      <label><input type="radio" name="t1" value="c"> C. A funny poem with 5 lines</label><br>
+      <label><input type="radio" name="t1" value="d"> D. A poem with no rules</label>
+    </div>
+    <div class="test-q">2. Which pattern is used in a haiku?<br>
+      <label><input type="radio" name="t2" value="a"> A. 7-7-7</label><br>
+      <label><input type="radio" name="t2" value="b"> B. 5-7-5</label><br>
+      <label><input type="radio" name="t2" value="c"> C. 2-4-6-8-2</label><br>
+      <label><input type="radio" name="t2" value="d"> D. AABBA</label>
+    </div>
+    <div class="test-q">3. What type of poem is funny and follows AABBA rhyme scheme?<br>
+      <label><input type="radio" name="t3" value="a"> A. Haiku</label><br>
+      <label><input type="radio" name="t3" value="b"> B. Limerick</label><br>
+      <label><input type="radio" name="t3" value="c"> C. Sonnet</label><br>
+      <label><input type="radio" name="t3" value="d"> D. Free verse</label>
+    </div>
+    <div class="test-q">4. Which poem has NO rules and does NOT have to rhyme?<br>
+      <label><input type="radio" name="t4" value="a"> A. Free verse</label><br>
+      <label><input type="radio" name="t4" value="b"> B. Sonnet</label><br>
+      <label><input type="radio" name="t4" value="c"> C. Cinquain</label><br>
+      <label><input type="radio" name="t4" value="d"> D. Diamante</label>
+    </div>
+    <div class="test-q">5. How many lines are in a sonnet?<br>
+      <label><input type="radio" name="t5" value="a"> A. 5</label><br>
+      <label><input type="radio" name="t5" value="b"> B. 7</label><br>
+      <label><input type="radio" name="t5" value="c"> C. 10</label><br>
+      <label><input type="radio" name="t5" value="d"> D. 14</label>
+    </div>
+
+    <h3 style="margin-top:20px">Part 2: Matching</h3>
+    <p style="font-size:.85em;opacity:.6">Match each poem type to its description.</p>
+    <div class="test-q">
+      <div style="margin:6px 0">6. Haiku <select id="tm1"><option value="">--</option><option value="a">A</option><option value="b">B</option><option value="c">C</option><option value="d">D</option></select></div>
+      <div style="margin:6px 0">7. Cinquain <select id="tm2"><option value="">--</option><option value="a">A</option><option value="b">B</option><option value="c">C</option><option value="d">D</option></select></div>
+      <div style="margin:6px 0">8. Couplet <select id="tm3"><option value="">--</option><option value="a">A</option><option value="b">B</option><option value="c">C</option><option value="d">D</option></select></div>
+      <div style="margin:6px 0">9. Diamante <select id="tm4"><option value="">--</option><option value="a">A</option><option value="b">B</option><option value="c">C</option><option value="d">D</option></select></div>
+      <br>A. Two rhyming lines<br>B. 5 lines with 2-4-6-8-2 syllables<br>C. 3 lines with 5-7-5 syllables<br>D. 7 lines shaped like a diamond
+    </div>
+
+    <h3 style="margin-top:20px">Part 3: Identify the Poem Type</h3>
+    <div class="test-q">10. <em>Little brown puppy / Running fast across the yard / Chasing butterflies</em><br>
+      <select id="ti1"><option value="">Pick a type...</option><option value="haiku">Haiku</option><option value="limerick">Limerick</option><option value="couplet">Couplet</option><option value="free">Free Verse</option><option value="acrostic">Acrostic</option></select>
+    </div>
+    <div class="test-q">11. <em>There once was a cat from Peru / Who dreamed he could fly like a shoe / He jumped in the air / And landed with flair / But now he says flying is through</em><br>
+      <select id="ti2"><option value="">Pick a type...</option><option value="haiku">Haiku</option><option value="limerick">Limerick</option><option value="sonnet">Sonnet</option><option value="cinquain">Cinquain</option><option value="diamante">Diamante</option></select>
+    </div>
+    <div class="test-q">12. <em>The sun is bright / It gives us light</em><br>
+      <select id="ti3"><option value="">Pick a type...</option><option value="haiku">Haiku</option><option value="couplet">Couplet</option><option value="sonnet">Sonnet</option><option value="limerick">Limerick</option><option value="free">Free Verse</option></select>
+    </div>
+
+    <h3 style="margin-top:20px">Part 4: Short Answer</h3>
+    <div class="test-q">13. What is repetition? Give an example.<br><textarea id="ts1" rows="2" style="width:100%;background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:10px;font-family:'Quicksand',sans-serif;font-size:.9em;min-height:60px" placeholder="Your answer..."></textarea></div>
+    <div class="test-q">14. What is imagery?<br><textarea id="ts2" rows="2" style="width:100%;background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:10px;font-family:'Quicksand',sans-serif;font-size:.9em;min-height:60px" placeholder="Your answer..."></textarea></div>
+    <div class="test-q">15. What is the theme of a poem?<br><textarea id="ts3" rows="2" style="width:100%;background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:10px;font-family:'Quicksand',sans-serif;font-size:.9em;min-height:60px" placeholder="Your answer..."></textarea></div>
+
+    <h3 style="margin-top:20px">&#x2B50; Bonus</h3>
+    <div class="test-q">16. Write a haiku (5-7-5):<br>
+      <input id="tb1" style="width:100%;margin:4px 0;background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:10px;font-family:'Quicksand',sans-serif" placeholder="Line 1 (5 syllables)"><br>
+      <input id="tb2" style="width:100%;margin:4px 0;background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:10px;font-family:'Quicksand',sans-serif" placeholder="Line 2 (7 syllables)"><br>
+      <input id="tb3" style="width:100%;margin:4px 0;background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:10px;font-family:'Quicksand',sans-serif" placeholder="Line 3 (5 syllables)">
+    </div>
+  </div>
+  <button class="check-btn" onclick="gradeTest()" style="margin-top:16px">&#x1F4DD; Grade My Test!</button>
+  <div id="test-results" style="max-width:560px;margin:16px auto"></div>`;
+
+  // Style test questions
+  const style=document.createElement('style');
+  style.textContent='.test-q{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:.95em;line-height:1.8} .test-q label{display:block;padding:4px 0;cursor:pointer;min-height:36px} .test-q select{background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px;font-family:"Quicksand",sans-serif;min-height:40px}';
+  area.appendChild(style);
+}
+
+function gradeTest(){
+  const answers={t1:'b',t2:'b',t3:'b',t4:'a',t5:'d',tm1:'c',tm2:'b',tm3:'a',tm4:'d',ti1:'haiku',ti2:'limerick',ti3:'couplet'};
+  let score=0,total=12,details=[];
+
+  // MC + Matching + Identify
+  for(const[id,correct] of Object.entries(answers)){
+    const el=document.querySelector(`input[name="${id}"]:checked`)||document.getElementById(id);
+    const val=el?el.value:'';
+    if(val===correct){score++;details.push(`&#x2705; Q${id}: Correct!`)}
+    else{details.push(`&#x274C; Q${id}: Your answer: ${val||'(blank)'}, Correct: ${correct}`)}
+  }
+
+  // Short answer - keyword check
+  const sa=[
+    {id:'ts1',keywords:['repeat','word','phrase','again','over'],label:'Repetition'},
+    {id:'ts2',keywords:['picture','sense','see','hear','feel','smell','taste','imagine'],label:'Imagery'},
+    {id:'ts3',keywords:['lesson','message','meaning','idea','moral','learn'],label:'Theme'},
+  ];
+  for(const s of sa){
+    const val=(document.getElementById(s.id).value||'').toLowerCase();
+    const found=s.keywords.some(k=>val.includes(k));
+    if(found&&val.length>10){score++;total++;details.push(`&#x2705; ${s.label}: Good answer!`)}
+    else if(val.length>5){total++;details.push(`&#x1F7E1; ${s.label}: Partial - try including words like: ${s.keywords.slice(0,3).join(', ')}`)}
+    else{total++;details.push(`&#x274C; ${s.label}: No answer`)}
+  }
+
+  // Bonus haiku
+  const h1=document.getElementById('tb1').value.trim();
+  const h2=document.getElementById('tb2').value.trim();
+  const h3=document.getElementById('tb3').value.trim();
+  if(h1&&h2&&h3){
+    const s1=h1.split(/\s+/).reduce((s,w)=>s+syl(w),0);
+    const s2=h2.split(/\s+/).reduce((s,w)=>s+syl(w),0);
+    const s3=h3.split(/\s+/).reduce((s,w)=>s+syl(w),0);
+    if(s1===5&&s2===7&&s3===5){score++;total++;details.push(`&#x2B50; BONUS: Perfect haiku! (${s1}-${s2}-${s3})`)}
+    else{total++;details.push(`&#x1F7E1; BONUS: Your haiku was ${s1}-${s2}-${s3} (needs 5-7-5)`)}
+  }
+
+  const pct=Math.round((score/total)*100);
+  let grade,emoji;
+  if(pct>=90){grade='A';emoji='&#x1F451;'}else if(pct>=80){grade='B';emoji='&#x2B50;'}else if(pct>=70){grade='C';emoji='&#x1F44D;'}else if(pct>=60){grade='D';emoji='&#x1F4AA;'}else{grade='Keep studying!';emoji='&#x1F4DA;'}
+
+  const earned=pct>=90?15:pct>=70?10:pct>=50?5:0;
+  G.gems+=earned;save();
+
+  document.getElementById('test-results').innerHTML=`
+    <div class="game-card" style="text-align:center">
+      <div style="font-size:3em">${emoji}</div>
+      <h3>Score: ${score}/${total} (${pct}%) - ${grade}</h3>
+      ${earned>0?`<p>&#x1F48E; +${earned} gems!</p>`:''}
+      <div style="text-align:left;margin-top:14px;font-size:.85em;line-height:1.8">${details.join('<br>')}</div>
+      <button class="check-btn" onclick="go('map')" style="margin-top:16px">&#x1F3F0; Back to Castle</button>
+    </div>`;
+}
+
+// ===== STUDY =====
+function renderStudy(){
+  let h='<div class="s-title">&#x1F4DD; Poetry Types</div>';
+  for(const t of STUDY_TYPES)h+=`<div class="s-card"><h3>${t.n}</h3><p>${t.r}</p>${t.e?`<div class="s-ex">${t.e}</div>`:''}</div>`;
+  h+='<div class="s-title elem">&#x2728; Poetry Elements</div>';
+  for(const e of STUDY_ELEM)h+=`<div class="s-card" style="border-left:3px solid #ff9800"><h3 style="color:#ff9800">${e.n}</h3><p>${e.d}</p><div class="s-ex">${e.e}</div></div>`;
+  document.getElementById('study-body').innerHTML=h;
+}
+
+// ===== INIT =====
+renderMap();
 </script>
 </body>
 </html>
