@@ -799,8 +799,9 @@ function renderEL(){
   if(ch.type==='pick'){
     const opts=ch.opts.sort(()=>Math.random()-.5);
     area.innerHTML=`<div class="game-card"><h3>&#x1F3F0; ${ch.title}</h3><p style="font-weight:600;margin-bottom:10px">${ch.q}</p>
-      <div class="mic-opts">${opts.map(o=>`<div class="mic-opt" onclick="elPick(this,'${o.replace(/'/g,"\\'")}')">${o}</div>`).join('')}</div></div>
+      <div class="mic-opts" id="el-opts">${opts.map((o,i)=>`<div class="mic-opt" data-idx="${i}">${o}</div>`).join('')}</div></div>
       <div class="feedback" id="el-fb"></div><button class="next-btn" id="el-next" onclick="nextEL()">Next Challenge &#x2192;</button>`;
+    document.getElementById('el-opts').addEventListener('click',function(e){const btn=e.target.closest('.mic-opt');if(!btn)return;elPick(btn,opts[parseInt(btn.dataset.idx)])});
   }
   else if(ch.type==='imagery-find'){
     const words=ch.text.split(/\s+/);
@@ -935,9 +936,10 @@ function renderB(){
       <div class="battle-q">
         <div style="font-size:.8em;opacity:.5;margin-bottom:6px">Question ${b.qIdx+1} of ${b.qs.length}</div>
         <div style="font-weight:700;margin-bottom:10px;font-size:1.05em">${q.q}</div>
-        <div class="battle-opts">${opts.map(o=>`<div class="b-opt" onclick="battleAnswer(this,'${o.replace(/'/g,"\\'")}')">${o}</div>`).join('')}</div>
+        <div class="battle-opts" id="battle-opts">${opts.map((o,i)=>`<div class="b-opt" data-idx="${i}">${o}</div>`).join('')}</div>
       </div>
     </div>`;
+    document.getElementById('battle-opts').addEventListener('click',function(e){const btn=e.target.closest('.b-opt');if(!btn)return;battleAnswer(btn,opts[parseInt(btn.dataset.idx)])});
 }
 
 function battleAnswer(el,ans){
@@ -1024,8 +1026,9 @@ function renderM(){
     <div class="game-card"><h3>&#x1F3A4; Drop the Mic!</h3><p style="font-size:.82em;opacity:.6;margin-bottom:8px">Pick the line that rhymes to complete the couplet!</p>
     <div class="mic-emoji">&#x1F3A4;</div>
     <div class="mic-line">${mic.line1}</div>
-    <div class="mic-opts">${opts.map(o=>`<div class="mic-opt" onclick="micAnswer(this,'${o.replace(/'/g,"\\'")}')">${o}</div>`).join('')}</div></div>
+    <div class="mic-opts" id="mic-opts">${opts.map((o,i)=>`<div class="mic-opt" data-idx="${i}">${o}</div>`).join('')}</div></div>
     <div class="feedback" id="m-fb"></div><button class="next-btn" id="m-next" onclick="nextM()">Next Couplet &#x2192;</button>`;
+    document.getElementById('mic-opts').addEventListener('click',function(e){const btn=e.target.closest('.mic-opt');if(!btn)return;micAnswer(btn,opts[parseInt(btn.dataset.idx)])});
 }
 function micAnswer(el,ans){
   const m=G.m,mic=MIC_DATA[m.round%MIC_DATA.length];
@@ -1136,8 +1139,9 @@ function renderLL(){
   document.getElementById('ll-area').innerHTML=`
     <div class="game-card"><h3>&#x1F923; Finish the Limerick!</h3><p style="font-size:.82em;opacity:.6;margin-bottom:8px">Pick the word that rhymes with lines 1 and 2!</p>
     <div class="limerick-display">${poemHtml}</div>
-    <div class="mic-opts">${opts.map(o=>`<div class="mic-opt" onclick="limAnswer(this,'${o}')">${o}</div>`).join('')}</div></div>
+    <div class="mic-opts" id="lim-opts">${opts.map((o,i)=>`<div class="mic-opt" data-idx="${i}">${o}</div>`).join('')}</div></div>
     <div class="feedback" id="ll-fb"></div><button class="next-btn" id="ll-next" onclick="nextLL()">Next Limerick &#x2192;</button>`;
+    document.getElementById('lim-opts').addEventListener('click',function(e){const btn=e.target.closest('.mic-opt');if(!btn)return;limAnswer(btn,opts[parseInt(btn.dataset.idx)])});
 }
 function limAnswer(el,ans){
   const ll=G.ll,lim=LIMERICK_DATA[ll.round%LIMERICK_DATA.length];
