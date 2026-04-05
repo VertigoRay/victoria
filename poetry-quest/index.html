@@ -90,6 +90,52 @@
     .la{background:#e91e63!important;color:white}.lb{background:#2196f3!important;color:white}.lc{background:#ff9800!important;color:white}
     .ba{border-left-color:#e91e63}.bb{border-left-color:#2196f3}.bc{border-left-color:#ff9800}
 
+    /* Imagery Detective */
+    .detective-bg{background:linear-gradient(180deg,#1b2a1b,#2d3b2d,#1b2a1b)}
+    .passage{background:rgba(255,255,255,.06);border-radius:12px;padding:16px;line-height:2;margin:10px 0}
+    .passage-word{display:inline;padding:4px 2px;border-radius:4px;cursor:pointer;transition:all .15s}
+    .passage-word:active{transform:scale(.92)}
+    .passage-word.selected{background:#4caf50;color:white;padding:4px 6px}
+    .passage-word.correct{background:#2e7d32;color:white;padding:4px 6px}
+    .passage-word.wrong{background:#c62828;color:white;padding:4px 6px;animation:shake .4s ease}
+    .found-count{text-align:center;font-size:1.1em;margin:10px 0;color:#81c784}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+    /* Diamond Forge */
+    .forge-bg{background:linear-gradient(180deg,#2a1a0a,#3d2b1a,#2a1a0a)}
+    .diamond-shape{max-width:400px;margin:10px auto;text-align:center}
+    .d-line{margin:4px 0;min-height:40px;display:flex;justify-content:center;flex-wrap:wrap;gap:4px;align-items:center}
+    .d-slot{display:inline-block;background:rgba(255,255,255,.1);border:2px dashed rgba(255,255,255,.2);border-radius:8px;padding:8px 12px;min-width:60px;min-height:38px;margin:2px;font-size:.9em;transition:all .2s}
+    .d-slot.filled{background:rgba(255,215,0,.15);border-color:#ffd700;border-style:solid}
+    .d-label{font-size:.7em;opacity:.5;display:block;margin-bottom:6px}
+    .word-options{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px}
+    .w-opt{background:linear-gradient(135deg,#e65100,#ff9800);color:white;padding:10px 14px;border-radius:16px;cursor:pointer;font-size:.9em;font-weight:600;font-family:'Quicksand',sans-serif;min-height:44px;display:flex;align-items:center;transition:all .15s}
+    .w-opt:active{transform:scale(.92)}
+    .w-opt.picked{opacity:.25;pointer-events:none}
+
+    /* Dragon Battle */
+    .dragon-bg{background:linear-gradient(180deg,#2a0a0a,#3d1a1a,#2a0a0a)}
+    .dragon-arena{text-align:center;max-width:500px;margin:0 auto}
+    .dragon-sprite{font-size:4em;margin:10px 0;transition:all .3s}
+    .dragon-sprite.hit{animation:dragonHit .5s ease}
+    .dragon-sprite.attack{animation:dragonAttack .6s ease}
+    @keyframes dragonHit{0%{transform:scale(1)}30%{transform:scale(.8) rotate(-5deg)}100%{transform:scale(1)}}
+    @keyframes dragonAttack{0%{transform:scale(1)}50%{transform:scale(1.3) translateY(-10px)}100%{transform:scale(1)}}
+    .hp-bar{background:rgba(255,255,255,.1);border-radius:8px;height:20px;margin:6px 0;overflow:hidden;position:relative}
+    .hp-fill{height:100%;border-radius:8px;transition:width .5s ease}
+    .hp-dragon .hp-fill{background:linear-gradient(90deg,#f44336,#ff5722)}
+    .hp-princess .hp-fill{background:linear-gradient(90deg,#e040fb,#ce93d8)}
+    .hp-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.75em;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+    .battle-q{background:rgba(255,255,255,.08);border-radius:12px;padding:16px;margin:12px 0}
+    .battle-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .b-opt{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.15);border-radius:10px;padding:12px;text-align:center;cursor:pointer;font-weight:600;font-family:'Quicksand',sans-serif;min-height:48px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .b-opt:active{transform:scale(.95)}
+    .b-opt.right{background:rgba(76,175,80,.3);border-color:#4caf50}
+    .b-opt.nope{background:rgba(244,67,54,.3);border-color:#f44336}
+    .b-opt.dis{pointer-events:none;opacity:.6}
+    .spell-effect{font-size:2em;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:spellPop .8s ease forwards;z-index:99}
+    @keyframes spellPop{0%{opacity:1;transform:translate(-50%,-50%) scale(.5)}50%{transform:translate(-50%,-50%) scale(1.5)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}
+
     /* Study */
     .study-bg{background:linear-gradient(180deg,#1a0a2e,#2d1b4e)}
     .s-card{background:rgba(255,255,255,.08);border-radius:12px;padding:14px;margin-bottom:10px;max-width:500px;margin-left:auto;margin-right:auto}
@@ -134,6 +180,35 @@
   </div>
   <div class="progress-dots" id="p-dots"></div>
   <div id="p-area"></div>
+</div>
+
+<div class="screen detective-bg" id="s-detective">
+  <div class="game-bar">
+    <button class="back-btn" onclick="go('map')">&#x2190; Castle</button>
+    <div class="game-title">&#x1F50D; Imagery Detective</div>
+    <div class="game-gems">&#x1F48E; <span id="d-gems">0</span></div>
+  </div>
+  <div class="progress-dots" id="d-dots"></div>
+  <div id="d-area"></div>
+</div>
+
+<div class="screen forge-bg" id="s-forge">
+  <div class="game-bar">
+    <button class="back-btn" onclick="go('map')">&#x2190; Castle</button>
+    <div class="game-title">&#x2666;&#xFE0F; Diamond Forge</div>
+    <div class="game-gems">&#x1F48E; <span id="f-gems">0</span></div>
+  </div>
+  <div class="progress-dots" id="f-dots"></div>
+  <div id="f-area"></div>
+</div>
+
+<div class="screen dragon-bg" id="s-dragon">
+  <div class="game-bar">
+    <button class="back-btn" onclick="go('map')">&#x2190; Castle</button>
+    <div class="game-title">&#x1F409; Poetry Dragon</div>
+    <div class="game-gems">&#x1F48E; <span id="b-gems">0</span></div>
+  </div>
+  <div id="b-area"></div>
 </div>
 
 <div class="screen study-bg" id="s-study">
@@ -194,9 +269,9 @@ load();
 const ROOMS=[
   {id:'kitchen',name:'Syllable Kitchen',icon:'\uD83E\uDDEA',desc:'Brew haiku poems with the perfect syllable count!',open:true},
   {id:'painter',name:'Rhyme Painter',icon:'\uD83C\uDFA8',desc:'Paint rhyme scheme patterns on poems!',open:true},
-  {id:'detective',name:'Imagery Detective',icon:'\uD83D\uDD0D',desc:'Find imagery hiding in poems!',open:false},
-  {id:'forge',name:'Diamond Forge',icon:'\u2666\uFE0F',desc:'Build diamante poems word by word!',open:false},
-  {id:'dragon',name:'Poetry Dragon',icon:'\uD83D\uDC09',desc:'Battle the dragon with poetry knowledge!',open:false},
+  {id:'detective',name:'Imagery Detective',icon:'\uD83D\uDD0D',desc:'Find imagery hiding in poems!',open:true},
+  {id:'forge',name:'Diamond Forge',icon:'\u2666\uFE0F',desc:'Build diamante poems word by word!',open:true},
+  {id:'dragon',name:'Poetry Dragon',icon:'\uD83D\uDC09',desc:'Battle the dragon with poetry knowledge!',open:true},
 ];
 
 // ===== NAV =====
@@ -205,6 +280,9 @@ function go(screen){
   if(screen==='map'){document.getElementById('s-map').classList.add('active');renderMap()}
   else if(screen==='kitchen'){document.getElementById('s-kitchen').classList.add('active');initK()}
   else if(screen==='painter'){document.getElementById('s-painter').classList.add('active');initP()}
+  else if(screen==='detective'){document.getElementById('s-detective').classList.add('active');initD()}
+  else if(screen==='forge'){document.getElementById('s-forge').classList.add('active');initF()}
+  else if(screen==='dragon'){document.getElementById('s-dragon').classList.add('active');initB()}
   else if(screen==='study'){document.getElementById('s-study').classList.add('active');renderStudy()}
 }
 
@@ -380,6 +458,278 @@ function nextP(){
     return;
   }
   renderP();
+}
+
+// ===== IMAGERY DETECTIVE =====
+const IMG_PASSAGES=[
+  {text:"The golden sun melted into the purple horizon as crickets began their evening song. The cool breeze carried the sweet scent of jasmine through the garden.",
+   imagery:["golden","melted","purple","evening song","cool breeze","sweet scent","jasmine"],
+   imgWords:["golden","melted","purple","song","cool","breeze","sweet","scent","jasmine"]},
+  {text:"Her icy fingers gripped the warm mug as steam curled upward like tiny ghosts. Outside the frosty window the world was wrapped in a thick white blanket of snow.",
+   imagery:["icy","warm","steam curled","tiny ghosts","frosty","thick white blanket"],
+   imgWords:["icy","warm","steam","curled","ghosts","frosty","thick","white","blanket"]},
+  {text:"The old wooden door creaked open to reveal a dark dusty room. Cobwebs hung like silver curtains and the musty air tickled her nose.",
+   imagery:["creaked","dark","dusty","silver curtains","musty","tickled"],
+   imgWords:["creaked","dark","dusty","cobwebs","silver","curtains","musty","tickled"]},
+  {text:"Thunder rumbled across the sky like angry drums. The sharp crack of lightning lit up the trembling trees and rain hammered the roof with a thousand tiny fists.",
+   imagery:["rumbled","angry drums","sharp crack","lit up","trembling","hammered","thousand tiny fists"],
+   imgWords:["rumbled","angry","drums","sharp","crack","lit","trembling","hammered","thousand","tiny","fists"]},
+];
+
+function initD(){G.d={round:0,gems:0,found:0,total:0,checked:false};document.getElementById('d-gems').textContent='0';renderD()}
+
+function renderD(){
+  const d=G.d,pass=IMG_PASSAGES[d.round%IMG_PASSAGES.length];
+  d.found=0;d.checked=false;
+  d.total=pass.imgWords.length;
+  const dots=document.getElementById('d-dots');
+  dots.innerHTML='';
+  for(let i=0;i<IMG_PASSAGES.length;i++){const dt=document.createElement('span');dt.className='dot'+(i<d.round?' done':'')+(i===d.round?' current':'');dots.appendChild(dt)}
+
+  const words=pass.text.split(/\s+/);
+  const wordHtml=words.map((w,i)=>{
+    const clean=w.toLowerCase().replace(/[^a-z]/g,'');
+    const isImg=pass.imgWords.includes(clean);
+    return `<span class="passage-word" data-img="${isImg?1:0}" data-clean="${clean}" onclick="tapImg(this)">${w} </span>`;
+  }).join('');
+
+  document.getElementById('d-area').innerHTML=`
+    <div class="game-card">
+      <h3>&#x1F50D; Find the Imagery!</h3>
+      <p style="font-size:.82em;opacity:.6;margin-bottom:8px">Tap every word that creates a picture in your mind (senses: see, hear, feel, smell, taste)</p>
+      <div class="found-count" id="d-count">Found: 0 / ${d.total}</div>
+      <div class="passage" id="d-passage">${wordHtml}</div>
+    </div>
+    <button class="check-btn" id="d-check" onclick="checkD()">&#x2728; Check My Answers!</button>
+    <div class="feedback" id="d-fb"></div>
+    <button class="next-btn" id="d-next" onclick="nextD()">Next Passage &#x2192;</button>`;
+}
+
+function tapImg(el){
+  if(G.d.checked)return;
+  el.classList.toggle('selected');
+  const selected=document.querySelectorAll('.passage-word.selected').length;
+  document.getElementById('d-count').textContent=`Found: ${selected} / ${G.d.total}`;
+}
+
+function checkD(){
+  if(G.d.checked)return;
+  G.d.checked=true;
+  let correct=0,wrong=0,missed=0;
+  document.querySelectorAll('.passage-word').forEach(el=>{
+    const isImg=el.dataset.img==='1';
+    const isSel=el.classList.contains('selected');
+    el.classList.remove('selected');
+    if(isImg&&isSel){el.classList.add('correct');correct++}
+    else if(!isImg&&isSel){el.classList.add('wrong');wrong++}
+    else if(isImg&&!isSel){missed++;setTimeout(()=>el.classList.add('correct'),600)}
+  });
+  const score=Math.max(0,correct-wrong);
+  const pct=Math.round((score/G.d.total)*100);
+  const earned=pct>=70?4:pct>=40?2:0;
+  G.d.gems+=earned;G.gems+=earned;save();
+  document.getElementById('d-gems').textContent=G.d.gems;
+  const fb=document.getElementById('d-fb');
+  if(pct>=70){fb.className='feedback show ok';fb.innerHTML=`<div>&#x1F50D; Great detective work! ${correct} found! +${earned} gems!</div><div class="small">${missed>0?missed+' missed, ':''}${wrong>0?wrong+' wrong guesses':''}</div>`}
+  else{fb.className='feedback show no';fb.innerHTML=`<div>Found ${correct}, missed ${missed}${wrong>0?', '+wrong+' wrong':''}.</div><div class="small">Imagery words are highlighted in green - study them!</div>`}
+  document.getElementById('d-check').disabled=true;
+  document.getElementById('d-next').classList.add('show');
+}
+
+function nextD(){
+  G.d.round++;
+  document.getElementById('d-next').classList.remove('show');
+  document.getElementById('d-fb').className='feedback';
+  if(G.d.round>=IMG_PASSAGES.length){
+    G.rooms.detective={done:true};save();
+    document.getElementById('d-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F575;&#xFE0F;</div><h3>Detective Complete!</h3><p>You earned &#x1F48E; ${G.d.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;
+    return;
+  }
+  renderD();
+}
+
+// ===== DIAMOND FORGE =====
+const DIAMANTE_DATA=[
+  {line1:["Sun"],line2:["Bright","Warm","Golden","Fierce"],line3:["Shining","Glowing","Burning","Rising","Setting"],line4:["Light","Day","Stars","Night","Hope","Peace","Darkness","Calm"],line5:["Fading","Dimming","Cooling","Resting","Sleeping"],line6:["Quiet","Peaceful","Silver","Cold"],line7:["Moon"],
+   answer:{l1:"Sun",l2:["Bright","Warm"],l3:["Shining","Glowing","Burning"],l4:["Light","Day","Stars","Night"],l5:["Fading","Dimming","Cooling"],l6:["Quiet","Peaceful"],l7:"Moon"}},
+  {line1:["Summer"],line2:["Hot","Sunny","Lazy","Long"],line3:["Swimming","Playing","Running","Laughing","Melting"],line4:["Pool","Beach","Snow","Ice","Fun","Sun","Cold","Frost"],line5:["Freezing","Shivering","Bundling","Sledding","Snowing"],line6:["Chilly","Frosty","White","Short"],line7:["Winter"],
+   answer:{l1:"Summer",l2:["Hot","Sunny"],l3:["Swimming","Playing","Laughing"],l4:["Pool","Beach","Snow","Ice"],l5:["Freezing","Shivering","Bundling"],l6:["Chilly","Frosty"],l7:"Winter"}},
+  {line1:["Happy"],line2:["Joyful","Cheerful","Bright","Smiling"],line3:["Laughing","Dancing","Singing","Skipping","Hoping"],line4:["Smile","Joy","Tears","Pain","Hope","Love","Fear","Grief"],line5:["Crying","Hiding","Hurting","Frowning","Worrying"],line6:["Gloomy","Lonely","Dark","Blue"],line7:["Sad"],
+   answer:{l1:"Happy",l2:["Joyful","Cheerful"],l3:["Laughing","Dancing","Singing"],l4:["Smile","Joy","Tears","Pain"],l5:["Crying","Hiding","Hurting"],l6:["Gloomy","Lonely"],l7:"Sad"}},
+];
+
+function initF(){G.f={round:0,gems:0,curLine:0,slots:[[],[],[],[],[],[],[]]};document.getElementById('f-gems').textContent='0';renderF()}
+
+function renderF(){
+  const f=G.f,dia=DIAMANTE_DATA[f.round%DIAMANTE_DATA.length];
+  f.curLine=0;f.slots=[[],[],[],[],[],[],[]];
+  const dots=document.getElementById('f-dots');
+  dots.innerHTML='';
+  for(let i=0;i<DIAMANTE_DATA.length;i++){const d=document.createElement('span');d.className='dot'+(i<f.round?' done':'')+(i===f.round?' current':'');dots.appendChild(d)}
+
+  const lineInfo=[
+    {label:"Noun",count:1},{label:"Adjective, Adjective",count:2},{label:"Verb, Verb, Verb",count:3},
+    {label:"Noun, Noun, Noun, Noun",count:4},{label:"Verb, Verb, Verb",count:3},
+    {label:"Adjective, Adjective",count:2},{label:"Noun (opposite)",count:1}
+  ];
+  const allWords=[];
+  [dia.line1,dia.line2,dia.line3,dia.line4,dia.line5,dia.line6,dia.line7].forEach(arr=>arr.forEach(w=>{if(!allWords.includes(w))allWords.push(w)}));
+  const shuffled=allWords.sort(()=>Math.random()-.5);
+
+  document.getElementById('f-area').innerHTML=`
+    <div class="game-card">
+      <h3>&#x2666;&#xFE0F; Forge a Diamante!</h3>
+      <p style="font-size:.82em;opacity:.6;margin-bottom:8px">Build a diamond-shaped poem! Tap words to fill each line. The first and last words should be opposites!</p>
+      <div class="diamond-shape" id="f-diamond">
+        ${lineInfo.map((li,i)=>`<div class="d-line" id="fl${i}"><span class="d-label">${li.label}</span>${Array(li.count).fill(0).map((_,j)=>`<span class="d-slot" id="fs${i}_${j}">?</span>`).join('')}</div>`).join('')}
+      </div>
+      <p style="text-align:center;font-size:.8em;opacity:.5;margin:8px 0">Building line: <strong id="f-linenum">1</strong> of 7</p>
+      <div class="word-options" id="f-words">${shuffled.map(w=>`<span class="w-opt" onclick="forgeWord(this,'${w}')">${w}</span>`).join('')}</div>
+    </div>
+    <button class="check-btn" id="f-check" onclick="checkF()" disabled>&#x2728; Check My Diamond!</button>
+    <div class="feedback" id="f-fb"></div>
+    <button class="next-btn" id="f-next" onclick="nextF()">Next Diamond &#x2192;</button>`;
+}
+
+function forgeWord(el,word){
+  const f=G.f,counts=[1,2,3,4,3,2,1];
+  if(f.slots[f.curLine].length>=counts[f.curLine])return;
+  f.slots[f.curLine].push(word);
+  el.classList.add('picked');
+  const idx=f.slots[f.curLine].length-1;
+  const slot=document.getElementById(`fs${f.curLine}_${idx}`);
+  if(slot){slot.textContent=word;slot.classList.add('filled')}
+  if(f.slots[f.curLine].length>=counts[f.curLine]){
+    f.curLine++;
+    document.getElementById('f-linenum').textContent=Math.min(f.curLine+1,7);
+    if(f.curLine>=7)document.getElementById('f-check').disabled=false;
+  }
+}
+
+function checkF(){
+  const f=G.f,dia=DIAMANTE_DATA[f.round%DIAMANTE_DATA.length],fb=document.getElementById('f-fb');
+  // Check structure is filled and first/last words match expected
+  const first=f.slots[0][0],last=f.slots[6][0];
+  const ans=dia.answer;
+  const firstOk=first===ans.l1,lastOk=last===ans.l7;
+  // Give partial credit
+  let score=0;
+  if(firstOk)score+=2;if(lastOk)score+=2;
+  // Check middle lines have reasonable words
+  score+=Math.min(f.slots[1].length,2)+Math.min(f.slots[2].length,3)+Math.min(f.slots[3].length,4)+Math.min(f.slots[4].length,3)+Math.min(f.slots[5].length,2);
+  const earned=firstOk&&lastOk?5:score>=10?3:1;
+  G.f.gems+=earned;G.gems+=earned;save();
+  document.getElementById('f-gems').textContent=G.f.gems;
+  if(firstOk&&lastOk){
+    fb.className='feedback show ok';
+    fb.innerHTML=`<div>&#x2666;&#xFE0F; Beautiful diamond! ${ans.l1} to ${ans.l7}! +${earned} gems!</div>`;
+  }else{
+    fb.className='feedback show ok';
+    fb.innerHTML=`<div>Nice try! +${earned} gems!</div><div class="small">The opposites should be ${ans.l1} and ${ans.l7}.</div>`;
+  }
+  document.getElementById('f-check').disabled=true;
+  document.getElementById('f-next').classList.add('show');
+}
+
+function nextF(){
+  G.f.round++;
+  document.getElementById('f-next').classList.remove('show');
+  document.getElementById('f-fb').className='feedback';
+  if(G.f.round>=DIAMANTE_DATA.length){
+    G.rooms.forge={done:true};save();
+    document.getElementById('f-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F48E;</div><h3>Forge Complete!</h3><p>You earned &#x1F48E; ${G.f.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;
+    return;
+  }
+  renderF();
+}
+
+// ===== POETRY DRAGON =====
+const DRAGON_QS=[
+  {q:"How many syllables in a haiku's first line?",a:"5",opts:["3","5","7","10"]},
+  {q:"What rhyme scheme does a limerick use?",a:"AABBA",opts:["ABAB","AABB","AABBA","ABBA"]},
+  {q:"How many lines does a sonnet have?",a:"14",opts:["10","12","14","7"]},
+  {q:"In a diamante, the first and last words are:",a:"Opposites",opts:["The same word","Rhyming words","Opposites","Verbs"]},
+  {q:"What makes free verse special?",a:"No rules about rhyme or meter",opts:["It must rhyme","No rules about rhyme or meter","It has 5 lines","It's always funny"]},
+  {q:"'Feathered wings' is an example of:",a:"Imagery",opts:["Repetition","Theme","Imagery","Rhyme Scheme"]},
+  {q:"Repeating words or phrases is called:",a:"Repetition",opts:["Imagery","Repetition","Theme","Rhyme Scheme"]},
+  {q:"The lesson or message of a poem is the:",a:"Theme",opts:["Rhyme Scheme","Imagery","Repetition","Theme"]},
+  {q:"A couplet has how many lines?",a:"2",opts:["2","4","5","7"]},
+  {q:"What is the syllable pattern of a cinquain?",a:"2-4-6-8-2",opts:["5-7-5","2-4-6-8-2","1-2-3-4-5","7-7-7-7-7"]},
+  {q:"In an acrostic, the first letters spell:",a:"A word or phrase",opts:["Nothing","A number","A word or phrase","The poet's name"]},
+  {q:"ABAB means:",a:"Every other line rhymes",opts:["First two lines rhyme","Every other line rhymes","Nothing rhymes","All lines rhyme"]},
+  {q:"A haiku comes from which country's tradition?",a:"Japan",opts:["France","Japan","England","Italy"]},
+  {q:"How many lines does a diamante have?",a:"7",opts:["5","6","7","14"]},
+  {q:"Which poem type is always humorous?",a:"Limerick",opts:["Haiku","Sonnet","Limerick","Free Verse"]},
+];
+
+function initB(){G.b={gems:0,dragonHp:100,princessHp:100,qIdx:0,qs:DRAGON_QS.sort(()=>Math.random()-.5).slice(0,10),done:false};document.getElementById('b-gems').textContent='0';renderB()}
+
+function renderB(){
+  const b=G.b;
+  if(b.done)return;
+  if(b.dragonHp<=0){
+    b.done=true;const earned=10;b.gems+=earned;G.gems+=earned;G.rooms.dragon={done:true};save();
+    document.getElementById('b-gems').textContent=b.gems;
+    document.getElementById('b-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F451;&#x1F389;&#x1F451;</div><h3>You defeated the Poetry Dragon!</h3><p style="margin:8px 0">Princess Victoria saves the castle!</p><p>You earned &#x1F48E; ${b.gems} gems!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;
+    return;
+  }
+  if(b.princessHp<=0||b.qIdx>=b.qs.length){
+    b.done=true;G.gems+=b.gems;save();
+    document.getElementById('b-gems').textContent=b.gems;
+    document.getElementById('b-area').innerHTML=`<div class="game-card complete-card"><div class="big">&#x1F4AA;</div><h3>The dragon was too strong this time!</h3><p style="margin:8px 0">You earned &#x1F48E; ${b.gems} gems. Study up and try again!</p><button class="check-btn" onclick="go('map')" style="margin-top:14px">&#x1F3F0; Back to Castle</button></div>`;
+    return;
+  }
+
+  const q=b.qs[b.qIdx];
+  const opts=q.opts.sort(()=>Math.random()-.5);
+
+  document.getElementById('b-area').innerHTML=`
+    <div class="dragon-arena">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px">
+        <div style="text-align:center"><div style="font-size:2em">&#x1F478;</div><div style="font-size:.7em;opacity:.7">Victoria</div></div>
+        <div style="font-size:.9em;opacity:.5">VS</div>
+        <div style="text-align:center"><div style="font-size:2em" id="dragon-face">&#x1F409;</div><div style="font-size:.7em;opacity:.7">Poetry Dragon</div></div>
+      </div>
+      <div class="hp-bar hp-princess"><div class="hp-fill" style="width:${b.princessHp}%"></div><span class="hp-label">&#x1F478; ${b.princessHp}%</span></div>
+      <div class="hp-bar hp-dragon"><div class="hp-fill" style="width:${b.dragonHp}%"></div><span class="hp-label">&#x1F409; ${b.dragonHp}%</span></div>
+      <div class="battle-q">
+        <div style="font-size:.8em;opacity:.5;margin-bottom:6px">Question ${b.qIdx+1} of ${b.qs.length}</div>
+        <div style="font-weight:700;margin-bottom:10px;font-size:1.05em">${q.q}</div>
+        <div class="battle-opts">${opts.map(o=>`<div class="b-opt" onclick="battleAnswer(this,'${o.replace(/'/g,"\\'")}')">${o}</div>`).join('')}</div>
+      </div>
+    </div>`;
+}
+
+function battleAnswer(el,ans){
+  const b=G.b,q=b.qs[b.qIdx];
+  const correct=ans===q.a;
+  document.querySelectorAll('.b-opt').forEach(o=>o.classList.add('dis'));
+  const dragon=document.getElementById('dragon-face');
+
+  if(correct){
+    el.classList.add('right');
+    b.dragonHp-=20;b.gems+=2;
+    dragon.classList.add('hit');
+    showSpell('\u2728\u26A1\u2728');
+    document.getElementById('b-gems').textContent=b.gems;
+  }else{
+    el.classList.add('nope');
+    b.princessHp-=20;
+    dragon.classList.add('attack');
+    showSpell('\uD83D\uDD25');
+    // Show correct
+    document.querySelectorAll('.b-opt').forEach(o=>{if(o.textContent===q.a)o.classList.add('right')});
+  }
+
+  b.qIdx++;
+  setTimeout(()=>renderB(),1500);
+}
+
+function showSpell(emoji){
+  const el=document.createElement('div');
+  el.className='spell-effect';el.textContent=emoji;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),800);
 }
 
 // ===== STUDY =====
