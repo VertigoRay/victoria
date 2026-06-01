@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roman Numerals Quest</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600;700&display=swap');
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Quicksand, sans-serif;
+      background: linear-gradient(180deg, #fce4ec 0%, #e1bee7 45%, #bbdefb 100%);
+      color: #3d115c;
+    }
+    a { color: #6a1b9a; font-weight: 700; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 24px; }
+    .hero, .card {
+      background: white;
+      border-radius: 24px;
+      padding: 22px;
+      margin: 16px 0;
+      box-shadow: 0 8px 28px rgba(106,27,154,.16);
+      border: 2px solid #e1bee7;
+    }
+    .hero h1 {
+      font-family: Pacifico, cursive;
+      margin: 0;
+      color: #6a1b9a;
+      font-size: 2.2rem;
+    }
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #7b1fa2, #ec407a);
+      color: white;
+      border-radius: 999px;
+      padding: 6px 14px;
+      margin: 0 0 10px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .pill {
+      border: 2px solid #e1bee7;
+      background: #fbf5ff;
+      color: #4a148c;
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      cursor: pointer;
+      user-select: none;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .pill.active { background: linear-gradient(135deg, #7b1fa2, #ec407a); border-color: transparent; color: white; }
+    .pill:active { transform: scale(.98); }
+    .select {
+      border: 2px solid #e1bee7;
+      background: #fff;
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-weight: 700;
+      color: #4a148c;
+      min-height: 44px;
+    }
+    .game {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .prompt {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #fbf5ff, #fff);
+      border: 2px dashed #ce93d8;
+    }
+    .big {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #4a148c;
+      letter-spacing: 1px;
+    }
+    .small { font-size: .9rem; opacity: .84; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .input {
+      flex: 1;
+      min-width: 240px;
+      border: 2px solid #e1bee7;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      outline: none;
+      color: #3d115c;
+      min-height: 48px;
+    }
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      font-weight: 900;
+      cursor: pointer;
+      min-height: 48px;
+    }
+    .btn.primary { background: linear-gradient(135deg, #7b1fa2, #ec407a); color: white; }
+    .btn.ghost { background: #fbf5ff; color: #4a148c; border: 2px solid #e1bee7; }
+    .btn:active { transform: scale(.98); }
+    .msg {
+      display: none;
+      padding: 14px;
+      border-radius: 18px;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+    .msg.show { display: block; }
+    .msg.ok { background: rgba(76,175,80,.15); border: 2px solid rgba(76,175,80,.35); color: #1b5e20; }
+    .msg.no { background: rgba(244,67,54,.12); border: 2px solid rgba(244,67,54,.28); color: #b71c1c; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .stat {
+      background: #fbf5ff;
+      border: 2px solid #e1bee7;
+      border-radius: 18px;
+      padding: 12px 14px;
+    }
+    .stat .k { font-weight: 900; color: #4a148c; }
+    .stat .v { font-size: 1.35rem; font-weight: 900; }
+    details { border-radius: 18px; overflow: hidden; border: 2px solid #e1bee7; background: #fff; }
+    summary { cursor: pointer; padding: 12px 14px; font-weight: 900; color: #4a148c; background: #fbf5ff; }
+    .panel { padding: 14px; }
+    .cheat { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+    .chip {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: #fbf5ff;
+      border: 2px solid #e1bee7;
+      font-weight: 900;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid #eee; text-align: left; }
+    th { color: #4a148c; }
+    .note { font-size: .92rem; opacity: .85; }
+    .footer { text-align: center; padding: 10px 0 30px; opacity: .7; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <p><a href="./">&larr; Back to Victoria's Learning Castle</a></p>
+
+    <section class="hero">
+      <div class="badge">Priority Quest &mdash; Roman Numerals 1&ndash;100</div>
+      <h1>Castle Code Training</h1>
+      <p>Goal: read and write Roman numerals through <strong>100</strong>, fast and confidently.</p>
+      <p class="note">Tip: If you get stuck, tap <strong>Hint</strong> and it will break the number into chunks.</p>
+    </section>
+
+    <section class="card">
+      <h2>Choose Your Quest Mode</h2>
+      <div class="pill-row" style="margin-top:10px">
+        <button class="pill active" id="mode-encode" type="button">Number &rarr; Roman</button>
+        <button class="pill" id="mode-decode" type="button">Roman &rarr; Number</button>
+        <label class="small" style="margin-left:auto;font-weight:800">Range:
+          <select class="select" id="range">
+            <option value="20">1&ndash;20</option>
+            <option value="50">1&ndash;50</option>
+            <option value="100" selected>1&ndash;100</option>
+          </select>
+        </label>
+        <label class="small" style="display:flex;gap:10px;align-items:center;font-weight:800">
+          Boss battles
+          <input id="boss" type="checkbox" style="transform:scale(1.2)" />
+        </label>
+      </div>
+    </section>
+
+    <section class="card game" id="game">
+      <div class="prompt">
+        <div>
+          <div class="small" id="prompt-label">Convert this number:</div>
+          <div class="big mono" id="prompt-value">?</div>
+        </div>
+        <div class="small" id="tiny-rule">
+          Remember: <span class="mono">IV</span>, <span class="mono">IX</span>, <span class="mono">XL</span>, <span class="mono">XC</span>.
+        </div>
+      </div>
+
+      <div class="row">
+        <input class="input mono" id="answer" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Type your answer…" />
+        <button class="btn primary" id="check" type="button">Check</button>
+        <button class="btn ghost" id="hint" type="button">Hint</button>
+        <button class="btn ghost" id="next" type="button">Next</button>
+      </div>
+
+      <div class="msg" id="msg"></div>
+
+      <div class="stats">
+        <div class="stat"><div class="k">Streak</div><div class="v mono" id="streak">0</div></div>
+        <div class="stat"><div class="k">Best Streak</div><div class="v mono" id="best">0</div></div>
+        <div class="stat"><div class="k">Correct</div><div class="v mono" id="correct">0</div></div>
+        <div class="stat"><div class="k">Attempts</div><div class="v mono" id="attempts">0</div></div>
+      </div>
+    </section>
+
+    <details class="card">
+      <summary>Cheat Sheet (tap to open)</summary>
+      <div class="panel">
+        <div class="cheat">
+          <div class="chip"><span class="mono">I</span><span>1</span></div>
+          <div class="chip"><span class="mono">V</span><span>5</span></div>
+          <div class="chip"><span class="mono">X</span><span>10</span></div>
+          <div class="chip"><span class="mono">L</span><span>50</span></div>
+          <div class="chip"><span class="mono">C</span><span>100</span></div>
+        </div>
+        <p class="note" style="margin-top:12px">
+          Pattern for tens: <span class="mono">X, XX, XXX, XL, L, LX, LXX, LXXX, XC, C</span>
+        </p>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary>1&ndash;20 Quick Reference (tap to open)</summary>
+      <div class="panel">
+        <table>
+          <thead><tr><th>Number</th><th>Roman</th><th>Number</th><th>Roman</th></tr></thead>
+          <tbody id="table-20"></tbody>
+        </table>
+      </div>
+    </details>
+
+    <div class="footer">&#x1F451; &#x2B50; &#x1F3F0; &#x2B50; &#x1F451;</div>
+  </main>
+
+  <script>
+    const TOKENS = [
+      { v: 100, r: 'C' },
+      { v: 90, r: 'XC' },
+      { v: 50, r: 'L' },
+      { v: 40, r: 'XL' },
+      { v: 10, r: 'X' },
+      { v: 9, r: 'IX' },
+      { v: 5, r: 'V' },
+      { v: 4, r: 'IV' },
+      { v: 1, r: 'I' },
+    ];
+
+    function toRoman(n) {
+      if (!Number.isInteger(n) || n < 1 || n > 100) return '';
+      let out = '';
+      let x = n;
+      for (const t of TOKENS) {
+        while (x >= t.v) { out += t.r; x -= t.v; }
+      }
+      return out;
+    }
+
+    function fromRoman(raw) {
+      if (!raw) return null;
+      const s = String(raw).trim().toUpperCase();
+      if (!/^[IVXLC]+$/.test(s)) return null;
+      let i = 0;
+      let total = 0;
+      while (i < s.length) {
+        let matched = false;
+        for (const t of TOKENS) {
+          if (s.startsWith(t.r, i)) {
+            total += t.v;
+            i += t.r.length;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) return null;
+      }
+      if (total < 1 || total > 100) return null;
+      return (toRoman(total) === s) ? total : null;
+    }
+
+    function breakdown(n) {
+      let x = n;
+      const parts = [];
+      for (const t of TOKENS) {
+        while (x >= t.v) { parts.push(t.r); x -= t.v; }
+      }
+      const roman = parts.join('');
+      const nice = parts.map(p => `<span class="mono">${p}</span>`).join(' + ');
+      return { roman, nice };
+    }
+
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    const BOSS_SET = [
+      4, 9, 14, 19,
+      40, 44, 49,
+      90, 94, 99,
+      100
+    ];
+
+    function pickNumber(max, bossMode) {
+      if (bossMode) return BOSS_SET[randInt(0, BOSS_SET.length - 1)];
+      return randInt(1, max);
+    }
+
+    const els = {
+      modeEncode: document.getElementById('mode-encode'),
+      modeDecode: document.getElementById('mode-decode'),
+      range: document.getElementById('range'),
+      boss: document.getElementById('boss'),
+      promptLabel: document.getElementById('prompt-label'),
+      promptValue: document.getElementById('prompt-value'),
+      answer: document.getElementById('answer'),
+      check: document.getElementById('check'),
+      hint: document.getElementById('hint'),
+      next: document.getElementById('next'),
+      msg: document.getElementById('msg'),
+      streak: document.getElementById('streak'),
+      best: document.getElementById('best'),
+      correct: document.getElementById('correct'),
+      attempts: document.getElementById('attempts'),
+      table20: document.getElementById('table-20'),
+      tinyRule: document.getElementById('tiny-rule'),
+    };
+
+    const STORAGE_KEY = 'romanNumeralsQuest.v1';
+
+    const state = {
+      mode: 'encode', // encode = number->roman, decode = roman->number
+      max: 100,
+      boss: false,
+      currentNumber: 1,
+      streak: 0,
+      best: 0,
+      correct: 0,
+      attempts: 0,
+    };
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        for (const k of Object.keys(state)) {
+          if (saved && Object.prototype.hasOwnProperty.call(saved, k)) state[k] = saved[k];
+        }
+      } catch {}
+    }
+
+    function save() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+    }
+
+    function setMode(m) {
+      state.mode = m;
+      els.modeEncode.classList.toggle('active', m === 'encode');
+      els.modeDecode.classList.toggle('active', m === 'decode');
+      els.promptLabel.textContent = (m === 'encode') ? 'Convert this number:' : 'Decode this Roman numeral:';
+      els.answer.type = (m === 'encode') ? 'text' : 'number';
+      els.answer.inputMode = (m === 'encode') ? 'text' : 'numeric';
+      els.answer.placeholder = (m === 'encode') ? 'Type Roman numerals (like XLIV)…' : 'Type a number (like 44)…';
+      els.answer.value = '';
+      hideMsg();
+      renderQuestion();
+      save();
+    }
+
+    function setRange(max) {
+      state.max = max;
+      els.range.value = String(max);
+      renderQuestion();
+      save();
+    }
+
+    function setBoss(on) {
+      state.boss = !!on;
+      els.boss.checked = state.boss;
+      renderQuestion();
+      save();
+    }
+
+    function showMsg(kind, html) {
+      els.msg.className = 'msg show ' + kind;
+      els.msg.innerHTML = html;
+    }
+
+    function hideMsg() {
+      els.msg.className = 'msg';
+      els.msg.innerHTML = '';
+    }
+
+    function updateStats() {
+      els.streak.textContent = String(state.streak);
+      els.best.textContent = String(state.best);
+      els.correct.textContent = String(state.correct);
+      els.attempts.textContent = String(state.attempts);
+    }
+
+    function renderQuestion() {
+      state.currentNumber = pickNumber(state.max, state.boss);
+      if (state.mode === 'encode') {
+        els.promptValue.textContent = String(state.currentNumber);
+        els.tinyRule.style.display = '';
+      } else {
+        els.promptValue.textContent = toRoman(state.currentNumber);
+        els.tinyRule.style.display = 'none';
+      }
+      els.answer.value = '';
+      els.answer.focus({ preventScroll: true });
+      hideMsg();
+      updateStats();
+      save();
+    }
+
+    function normalizeRomanInput(s) {
+      return String(s || '').toUpperCase().replace(/\s+/g, '');
+    }
+
+    function checkAnswer() {
+      state.attempts += 1;
+
+      if (state.mode === 'encode') {
+        const given = normalizeRomanInput(els.answer.value);
+        const expected = toRoman(state.currentNumber);
+        if (given && fromRoman(given) === state.currentNumber) {
+          state.correct += 1;
+          state.streak += 1;
+          state.best = Math.max(state.best, state.streak);
+          showMsg('ok', `&#x2705; Correct! <span class="mono">${expected}</span>`);
+        } else {
+          state.streak = 0;
+          const hint = breakdown(state.currentNumber);
+          showMsg('no', `&#x274C; Not quite. Correct answer: <span class="mono">${expected}</span><div class="small">Breakdown: ${hint.nice}</div>`);
+        }
+      } else {
+        const n = Number(els.answer.value);
+        const expected = state.currentNumber;
+        if (Number.isInteger(n) && n === expected) {
+          state.correct += 1;
+          state.streak += 1;
+          state.best = Math.max(state.best, state.streak);
+          showMsg('ok', `&#x2705; Correct! <span class="mono">${toRoman(expected)}</span> = <span class="mono">${expected}</span>`);
+        } else {
+          state.streak = 0;
+          const hint = breakdown(state.currentNumber);
+          showMsg('no', `&#x274C; Not quite. Correct answer: <span class="mono">${expected}</span><div class="small">Breakdown: ${hint.nice}</div>`);
+        }
+      }
+
+      updateStats();
+      save();
+    }
+
+    function hint() {
+      const b = breakdown(state.currentNumber);
+      if (state.mode === 'encode') {
+        showMsg('ok', `&#x1F4A1; Hint: ${b.nice} = <span class="mono">${b.roman}</span>`);
+      } else {
+        showMsg('ok', `&#x1F4A1; Hint: <span class="mono">${b.roman}</span> = ${b.nice.replaceAll('+', '&#43;')}`);
+      }
+    }
+
+    function buildTable20() {
+      const rows = [];
+      for (let i = 1; i <= 20; i += 2) {
+        const a = i;
+        const b = i + 1;
+        rows.push(`<tr><td class="mono">${a}</td><td class="mono">${toRoman(a)}</td><td class="mono">${b}</td><td class="mono">${toRoman(b)}</td></tr>`);
+      }
+      els.table20.innerHTML = rows.join('');
+    }
+
+    // Events
+    els.modeEncode.addEventListener('click', () => setMode('encode'));
+    els.modeDecode.addEventListener('click', () => setMode('decode'));
+    els.range.addEventListener('change', (e) => setRange(Number(e.target.value || 100)));
+    els.boss.addEventListener('change', (e) => setBoss(e.target.checked));
+    els.check.addEventListener('click', checkAnswer);
+    els.hint.addEventListener('click', hint);
+    els.next.addEventListener('click', renderQuestion);
+    els.answer.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkAnswer();
+    });
+    els.answer.addEventListener('input', () => {
+      if (state.mode === 'encode') els.answer.value = normalizeRomanInput(els.answer.value);
+    });
+
+    // Init
+    buildTable20();
+    load();
+    els.range.value = String(state.max);
+    els.boss.checked = !!state.boss;
+    setMode(state.mode === 'decode' ? 'decode' : 'encode');
+    updateStats();
+  </script>
+</body>
+</html>
+
