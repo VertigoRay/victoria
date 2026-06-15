@@ -14,7 +14,7 @@
       color: #3d115c;
     }
     a { color: #6a1b9a; font-weight: 700; }
-    .wrap { max-width: 920px; margin: 0 auto; padding: 24px; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 24px; }
     .hero, .card {
       background: white;
       border-radius: 24px;
@@ -39,7 +39,21 @@
       font-weight: 800;
       letter-spacing: 0.2px;
     }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .hero-grid, .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .subcard {
+      background: #fbf5ff;
+      border: 2px solid #e1bee7;
+      border-radius: 20px;
+      padding: 16px;
+    }
+    .subcard h3, .card h2 {
+      margin: 0 0 10px;
+      color: #4a148c;
+    }
     .pill-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
     .pill {
       border: 2px solid #e1bee7;
@@ -58,7 +72,7 @@
     }
     .pill.active { background: linear-gradient(135deg, #7b1fa2, #ec407a); border-color: transparent; color: white; }
     .pill:active { transform: scale(.98); }
-    .select {
+    .select, .profile-input {
       border: 2px solid #e1bee7;
       background: #fff;
       border-radius: 14px;
@@ -66,6 +80,7 @@
       font-weight: 700;
       color: #4a148c;
       min-height: 44px;
+      width: 100%;
     }
     .game {
       display: grid;
@@ -85,7 +100,7 @@
       border: 2px dashed #ce93d8;
     }
     .big {
-      font-size: 2.2rem;
+      font-size: 2.4rem;
       font-weight: 900;
       color: #4a148c;
       letter-spacing: 1px;
@@ -128,7 +143,7 @@
     .msg.no { background: rgba(244,67,54,.12); border: 2px solid rgba(244,67,54,.28); color: #b71c1c; }
     .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 12px;
       margin-top: 10px;
     }
@@ -140,6 +155,38 @@
     }
     .stat .k { font-weight: 900; color: #4a148c; }
     .stat .v { font-size: 1.35rem; font-weight: 900; }
+    .quest-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .quest-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 2px solid #e1bee7;
+      background: #fff;
+    }
+    .quest-item.done {
+      border-color: #81c784;
+      background: rgba(129,199,132,.14);
+    }
+    .meter {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: #f1e4f7;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .meter-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(135deg, #7b1fa2, #ec407a);
+    }
     details { border-radius: 18px; overflow: hidden; border: 2px solid #e1bee7; background: #fff; }
     summary { cursor: pointer; padding: 12px 14px; font-weight: 900; color: #4a148c; background: #fbf5ff; }
     .panel { padding: 14px; }
@@ -167,28 +214,62 @@
     <p><a href="./">&larr; Back to Victoria's Learning Castle</a></p>
 
     <section class="hero">
-      <div class="badge">Priority Quest &mdash; Roman Numerals 1&ndash;100</div>
+      <div class="badge">Priority Quest - Roman Numerals 1-100</div>
       <h1>Castle Code Training</h1>
       <p>Goal: read and write Roman numerals through <strong>100</strong>, fast and confidently.</p>
-      <p class="note">Tip: If you get stuck, tap <strong>Hint</strong> and it will break the number into chunks.</p>
+      <p class="note">This version adds a stronger motivation loop: pick your name, build XP, clear a daily quest board, and save progress on this device for Victoria or any friend using the page.</p>
+
+      <div class="hero-grid" style="margin-top:16px">
+        <div class="subcard">
+          <h3>Adventurer Badge</h3>
+          <label class="small" for="player-name">Hero name</label>
+          <input class="profile-input" id="player-name" maxlength="24" placeholder="Type your name" />
+          <p class="note" id="welcome" style="margin-top:10px">Welcome, brave learner.</p>
+        </div>
+        <div class="subcard">
+          <h3>Level Path</h3>
+          <div><strong id="title-rank">Sparkle Squire</strong></div>
+          <div class="small">Level <span class="mono" id="level">1</span> - XP <span class="mono" id="xp">0</span></div>
+          <div class="meter"><div class="meter-fill" id="xp-bar"></div></div>
+          <p class="note" id="xp-note" style="margin-top:10px">Earn 40 XP to reach the next castle title.</p>
+        </div>
+      </div>
     </section>
 
     <section class="card">
       <h2>Choose Your Quest Mode</h2>
       <div class="pill-row" style="margin-top:10px">
-        <button class="pill active" id="mode-encode" type="button">Number &rarr; Roman</button>
-        <button class="pill" id="mode-decode" type="button">Roman &rarr; Number</button>
+        <button class="pill active" id="mode-encode" type="button">Number -&gt; Roman</button>
+        <button class="pill" id="mode-decode" type="button">Roman -&gt; Number</button>
         <label class="small" style="margin-left:auto;font-weight:800">Range:
           <select class="select" id="range">
-            <option value="20">1&ndash;20</option>
-            <option value="50">1&ndash;50</option>
-            <option value="100" selected>1&ndash;100</option>
+            <option value="20">1-20</option>
+            <option value="50">1-50</option>
+            <option value="100" selected>1-100</option>
           </select>
         </label>
         <label class="small" style="display:flex;gap:10px;align-items:center;font-weight:800">
           Boss battles
           <input id="boss" type="checkbox" style="transform:scale(1.2)" />
         </label>
+      </div>
+    </section>
+
+    <section class="card grid">
+      <div>
+        <h2>Quest Board</h2>
+        <p class="note">Inspired by the tutoring-thread request for stronger motivation loops: clear these mini goals and watch the board light up.</p>
+        <div class="quest-list" id="quest-list"></div>
+      </div>
+      <div>
+        <h2>Victory Kit</h2>
+        <p class="note">Correct answers build streak and XP. Boss wins give bonus XP. Hearts drop on misses, then refill after a reset so practice keeps moving.</p>
+        <div class="stats">
+          <div class="stat"><div class="k">Hearts</div><div class="v mono" id="hearts">3</div></div>
+          <div class="stat"><div class="k">Boss Wins</div><div class="v mono" id="boss-wins">0</div></div>
+          <div class="stat"><div class="k">Accuracy</div><div class="v mono" id="accuracy">0%</div></div>
+          <div class="stat"><div class="k">Daily Glow</div><div class="v mono" id="daily-glow">0/3</div></div>
+        </div>
       </div>
     </section>
 
@@ -204,7 +285,7 @@
       </div>
 
       <div class="row">
-        <input class="input mono" id="answer" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Type your answer…" />
+        <input class="input mono" id="answer" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Type your answer..." />
         <button class="btn primary" id="check" type="button">Check</button>
         <button class="btn ghost" id="hint" type="button">Hint</button>
         <button class="btn ghost" id="next" type="button">Next</button>
@@ -237,7 +318,7 @@
     </details>
 
     <details class="card">
-      <summary>1&ndash;20 Quick Reference (tap to open)</summary>
+      <summary>1-20 Quick Reference (tap to open)</summary>
       <div class="panel">
         <table>
           <thead><tr><th>Number</th><th>Roman</th><th>Number</th><th>Roman</th></tr></thead>
@@ -260,6 +341,19 @@
       { v: 5, r: 'V' },
       { v: 4, r: 'IV' },
       { v: 1, r: 'I' },
+    ];
+
+    const TITLES = [
+      { xp: 0, name: 'Sparkle Squire' },
+      { xp: 40, name: 'Castle Knight' },
+      { xp: 90, name: 'Royal Solver' },
+      { xp: 160, name: 'Roman Legend' },
+    ];
+
+    const QUESTS = [
+      { id: 'warmup', label: 'Warm-up wizard', target: 3, value: (state) => state.correct },
+      { id: 'streak', label: 'Five in a row', target: 5, value: (state) => state.best },
+      { id: 'boss', label: 'Win one boss battle', target: 1, value: (state) => state.bossWins },
     ];
 
     function toRoman(n) {
@@ -301,7 +395,7 @@
         while (x >= t.v) { parts.push(t.r); x -= t.v; }
       }
       const roman = parts.join('');
-      const nice = parts.map(p => `<span class="mono">${p}</span>`).join(' + ');
+      const nice = parts.map((p) => `<span class="mono">${p}</span>`).join(' + ');
       return { roman, nice };
     }
 
@@ -309,16 +403,26 @@
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    const BOSS_SET = [
-      4, 9, 14, 19,
-      40, 44, 49,
-      90, 94, 99,
-      100
-    ];
+    const BOSS_SET = [4, 9, 14, 19, 40, 44, 49, 90, 94, 99, 100];
 
     function pickNumber(max, bossMode) {
       if (bossMode) return BOSS_SET[randInt(0, BOSS_SET.length - 1)];
       return randInt(1, max);
+    }
+
+    function getRank(xp) {
+      let current = TITLES[0];
+      for (const title of TITLES) {
+        if (xp >= title.xp) current = title;
+      }
+      return current;
+    }
+
+    function getNextRank(xp) {
+      for (const title of TITLES) {
+        if (title.xp > xp) return title;
+      }
+      return null;
     }
 
     const els = {
@@ -337,14 +441,27 @@
       best: document.getElementById('best'),
       correct: document.getElementById('correct'),
       attempts: document.getElementById('attempts'),
+      accuracy: document.getElementById('accuracy'),
+      hearts: document.getElementById('hearts'),
+      bossWins: document.getElementById('boss-wins'),
+      dailyGlow: document.getElementById('daily-glow'),
+      xp: document.getElementById('xp'),
+      level: document.getElementById('level'),
+      titleRank: document.getElementById('title-rank'),
+      xpBar: document.getElementById('xp-bar'),
+      xpNote: document.getElementById('xp-note'),
+      questList: document.getElementById('quest-list'),
       table20: document.getElementById('table-20'),
       tinyRule: document.getElementById('tiny-rule'),
+      playerName: document.getElementById('player-name'),
+      welcome: document.getElementById('welcome'),
     };
 
-    const STORAGE_KEY = 'romanNumeralsQuest.v1';
+    const STORAGE_KEY = 'victoria.romanNumeralsQuest.v2';
 
     const state = {
-      mode: 'encode', // encode = number->roman, decode = roman->number
+      playerName: '',
+      mode: 'encode',
       max: 100,
       boss: false,
       currentNumber: 1,
@@ -352,6 +469,9 @@
       best: 0,
       correct: 0,
       attempts: 0,
+      xp: 0,
+      hearts: 3,
+      bossWins: 0,
     };
 
     function load() {
@@ -369,6 +489,43 @@
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
     }
 
+    function completedQuestCount() {
+      return QUESTS.filter((quest) => quest.value(state) >= quest.target).length;
+    }
+
+    function renderQuestBoard() {
+      els.questList.innerHTML = QUESTS.map((quest) => {
+        const current = Math.min(quest.value(state), quest.target);
+        const done = current >= quest.target;
+        return `<div class="quest-item${done ? ' done' : ''}"><strong>${quest.label}</strong><span class="mono">${current}/${quest.target}</span></div>`;
+      }).join('');
+      els.dailyGlow.textContent = `${completedQuestCount()}/3`;
+    }
+
+    function updateProfile() {
+      const name = state.playerName.trim() || 'brave learner';
+      els.playerName.value = state.playerName;
+      els.welcome.textContent = `Welcome, ${name}. Your progress stays saved on this device.`;
+    }
+
+    function updateLevel() {
+      const rank = getRank(state.xp);
+      const next = getNextRank(state.xp);
+      const levelIndex = TITLES.indexOf(rank) + 1;
+      els.titleRank.textContent = rank.name;
+      els.level.textContent = String(levelIndex);
+      els.xp.textContent = String(state.xp);
+      if (next) {
+        const span = next.xp - rank.xp;
+        const progress = state.xp - rank.xp;
+        els.xpBar.style.width = `${Math.max(8, Math.min(100, (progress / span) * 100))}%`;
+        els.xpNote.textContent = `Earn ${next.xp - state.xp} XP to reach ${next.name}.`;
+      } else {
+        els.xpBar.style.width = '100%';
+        els.xpNote.textContent = 'Max title reached. Keep practicing to stay sharp.';
+      }
+    }
+
     function setMode(m) {
       state.mode = m;
       els.modeEncode.classList.toggle('active', m === 'encode');
@@ -376,7 +533,7 @@
       els.promptLabel.textContent = (m === 'encode') ? 'Convert this number:' : 'Decode this Roman numeral:';
       els.answer.type = (m === 'encode') ? 'text' : 'number';
       els.answer.inputMode = (m === 'encode') ? 'text' : 'numeric';
-      els.answer.placeholder = (m === 'encode') ? 'Type Roman numerals (like XLIV)…' : 'Type a number (like 44)…';
+      els.answer.placeholder = (m === 'encode') ? 'Type Roman numerals (like XLIV)...' : 'Type a number (like 44)...';
       els.answer.value = '';
       hideMsg();
       renderQuestion();
@@ -408,10 +565,17 @@
     }
 
     function updateStats() {
+      const accuracy = state.attempts ? Math.round((state.correct / state.attempts) * 100) : 0;
       els.streak.textContent = String(state.streak);
       els.best.textContent = String(state.best);
       els.correct.textContent = String(state.correct);
       els.attempts.textContent = String(state.attempts);
+      els.accuracy.textContent = `${accuracy}%`;
+      els.hearts.textContent = String(state.hearts);
+      els.bossWins.textContent = String(state.bossWins);
+      renderQuestBoard();
+      updateLevel();
+      updateProfile();
     }
 
     function renderQuestion() {
@@ -434,6 +598,24 @@
       return String(s || '').toUpperCase().replace(/\s+/g, '');
     }
 
+    function applyMissPenalty() {
+      state.hearts = Math.max(0, state.hearts - 1);
+      if (state.hearts === 0) {
+        state.hearts = 3;
+        state.streak = 0;
+        return true;
+      }
+      return false;
+    }
+
+    function grantWinRewards() {
+      state.correct += 1;
+      state.streak += 1;
+      state.best = Math.max(state.best, state.streak);
+      state.xp += state.boss ? 15 : 10;
+      if (state.boss) state.bossWins += 1;
+    }
+
     function checkAnswer() {
       state.attempts += 1;
 
@@ -441,27 +623,25 @@
         const given = normalizeRomanInput(els.answer.value);
         const expected = toRoman(state.currentNumber);
         if (given && fromRoman(given) === state.currentNumber) {
-          state.correct += 1;
-          state.streak += 1;
-          state.best = Math.max(state.best, state.streak);
-          showMsg('ok', `&#x2705; Correct! <span class="mono">${expected}</span>`);
+          grantWinRewards();
+          showMsg('ok', `&#x2705; Correct! <span class="mono">${expected}</span> ${state.boss ? 'Boss bonus: +15 XP.' : '+10 XP.'}`);
         } else {
           state.streak = 0;
           const hint = breakdown(state.currentNumber);
-          showMsg('no', `&#x274C; Not quite. Correct answer: <span class="mono">${expected}</span><div class="small">Breakdown: ${hint.nice}</div>`);
+          const reset = applyMissPenalty();
+          showMsg('no', `&#x274C; Not quite. Correct answer: <span class="mono">${expected}</span><div class="small">Breakdown: ${hint.nice}</div><div class="small">${reset ? 'All hearts used. Hearts refilled to 3 so the quest can continue.' : 'One heart lost. Keep going.'}</div>`);
         }
       } else {
         const n = Number(els.answer.value);
         const expected = state.currentNumber;
         if (Number.isInteger(n) && n === expected) {
-          state.correct += 1;
-          state.streak += 1;
-          state.best = Math.max(state.best, state.streak);
-          showMsg('ok', `&#x2705; Correct! <span class="mono">${toRoman(expected)}</span> = <span class="mono">${expected}</span>`);
+          grantWinRewards();
+          showMsg('ok', `&#x2705; Correct! <span class="mono">${toRoman(expected)}</span> = <span class="mono">${expected}</span> ${state.boss ? 'Boss bonus: +15 XP.' : '+10 XP.'}`);
         } else {
           state.streak = 0;
           const hint = breakdown(state.currentNumber);
-          showMsg('no', `&#x274C; Not quite. Correct answer: <span class="mono">${expected}</span><div class="small">Breakdown: ${hint.nice}</div>`);
+          const reset = applyMissPenalty();
+          showMsg('no', `&#x274C; Not quite. Correct answer: <span class="mono">${expected}</span><div class="small">Breakdown: ${hint.nice}</div><div class="small">${reset ? 'All hearts used. Hearts refilled to 3 so the quest can continue.' : 'One heart lost. Keep going.'}</div>`);
         }
       }
 
@@ -488,7 +668,6 @@
       els.table20.innerHTML = rows.join('');
     }
 
-    // Events
     els.modeEncode.addEventListener('click', () => setMode('encode'));
     els.modeDecode.addEventListener('click', () => setMode('decode'));
     els.range.addEventListener('change', (e) => setRange(Number(e.target.value || 100)));
@@ -496,6 +675,11 @@
     els.check.addEventListener('click', checkAnswer);
     els.hint.addEventListener('click', hint);
     els.next.addEventListener('click', renderQuestion);
+    els.playerName.addEventListener('input', (e) => {
+      state.playerName = String(e.target.value || '').trimStart();
+      updateProfile();
+      save();
+    });
     els.answer.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') checkAnswer();
     });
@@ -503,14 +687,13 @@
       if (state.mode === 'encode') els.answer.value = normalizeRomanInput(els.answer.value);
     });
 
-    // Init
     buildTable20();
     load();
     els.range.value = String(state.max);
     els.boss.checked = !!state.boss;
+    updateProfile();
     setMode(state.mode === 'decode' ? 'decode' : 'encode');
     updateStats();
   </script>
 </body>
 </html>
-
