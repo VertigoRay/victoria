@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Victoria Notebook Quest</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;700;900&display=swap');
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Nunito, sans-serif;
+      background:
+        linear-gradient(180deg, #fffaf2 0%, #fff0f7 40%, #eef6ff 100%);
+      color: #3f2f4f;
+    }
+    a { color: #d9488b; font-weight: 800; }
+    .page {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 22px;
+    }
+    .hero, .panel {
+      background: rgba(255,255,255,0.95);
+      border: 3px solid #ffd6e8;
+      border-radius: 28px;
+      box-shadow: 0 14px 36px rgba(217,72,139,0.12);
+      padding: 22px;
+      margin: 16px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before, .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 18px;
+      width: 4px;
+      background: linear-gradient(180deg, #7cb6ff, #7cb6ff 10px, transparent 10px, transparent 28px);
+      background-size: 4px 28px;
+      opacity: 0.65;
+    }
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff6fa9, #ffb347);
+      color: white;
+      padding: 7px 14px;
+      font-size: 0.88rem;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      margin-bottom: 10px;
+    }
+    h1, h2, h3 {
+      margin: 0 0 10px;
+      color: #b73378;
+    }
+    h1 {
+      font-family: "Patrick Hand", cursive;
+      font-size: 3rem;
+      line-height: 0.96;
+      color: #c1276b;
+    }
+    .lede, .note, .tiny { line-height: 1.5; }
+    .lede { max-width: 760px; font-size: 1.05rem; }
+    .tiny { font-size: 0.88rem; opacity: 0.8; }
+    .hero-grid, .mission-grid, .top-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .hero-grid, .top-grid {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      margin-top: 18px;
+    }
+    .mission-grid {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      margin-top: 14px;
+    }
+    .cardlet, .mission {
+      background: linear-gradient(180deg, #fffdf7, #fff);
+      border: 2px solid #ffe1ef;
+      border-radius: 22px;
+      padding: 16px;
+      position: relative;
+    }
+    .mission {
+      min-height: 100%;
+      padding-bottom: 20px;
+    }
+    .doodle {
+      position: absolute;
+      font-family: "Patrick Hand", cursive;
+      font-size: 1.15rem;
+      color: rgba(193,39,107,0.78);
+      transform: rotate(-7deg);
+      right: 16px;
+      top: 14px;
+    }
+    .marker {
+      display: inline;
+      padding: 0 6px 2px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255,236,120,0.12), rgba(255,236,120,0.82));
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    .name-input {
+      width: 100%;
+      min-height: 46px;
+      border-radius: 14px;
+      border: 2px solid #ffc7de;
+      padding: 10px 12px;
+      font: inherit;
+      font-weight: 800;
+      color: #82234f;
+    }
+    .xp-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .pill {
+      background: #fff7fb;
+      border: 2px solid #ffd6e8;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 900;
+      color: #a42c63;
+    }
+    .meter {
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: #ffe7f1;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .meter-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(135deg, #ff7bb0, #ffb347);
+    }
+    ul.checks {
+      list-style: none;
+      padding: 0;
+      margin: 14px 0 0;
+      display: grid;
+      gap: 10px;
+    }
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(255,255,255,0.9);
+      border: 2px solid #ffe4f0;
+      border-radius: 16px;
+      padding: 10px 12px;
+    }
+    .check input {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: #ff6fa9;
+      flex: 0 0 auto;
+    }
+    .check strong { display: block; color: #93255a; }
+    .power-note {
+      background: linear-gradient(180deg, #fff9c8, #fff0a8);
+      border: 2px dashed #f1c232;
+      border-radius: 18px;
+      padding: 12px 14px;
+      margin-top: 12px;
+      color: #694d06;
+    }
+    .power-note h3 { color: #8f5d00; }
+    .boss-box {
+      background: linear-gradient(135deg, #f8eaff, #fff4fb);
+      border: 2px solid #deb7ff;
+      border-radius: 22px;
+      padding: 18px;
+      margin-top: 16px;
+    }
+    .boss-box textarea {
+      width: 100%;
+      min-height: 120px;
+      border: 2px solid #ddc2ff;
+      border-radius: 16px;
+      padding: 12px;
+      font: inherit;
+      resize: vertical;
+    }
+    .footer {
+      text-align: center;
+      padding: 8px 0 28px;
+      color: #a64d79;
+      font-family: "Patrick Hand", cursive;
+      font-size: 1.5rem;
+    }
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    @media (max-width: 720px) {
+      h1 { font-size: 2.5rem; }
+      .page { padding: 14px; }
+      .hero, .panel { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <p><a href="./">&larr; Back to Victoria's Learning Castle</a></p>
+
+    <section class="hero">
+      <div class="badge">Notebook Mission - cross-subject practice</div>
+      <h1>Princess Study Notebook</h1>
+      <p class="lede">This page borrows the bright, doodly notebook energy from the tutoring-thread research: <span class="marker">power notes, quick missions, highlighted tricks, and a teach-back final boss</span> instead of plain worksheet blocks.</p>
+
+      <div class="hero-grid">
+        <div class="cardlet">
+          <div class="doodle">sparkle plan</div>
+          <h2>Notebook Owner</h2>
+          <label class="tiny" for="player-name">Name on the cover</label>
+          <input class="name-input" id="player-name" maxlength="28" placeholder="Type your name" />
+          <p class="tiny" id="welcome" style="margin-top:10px">Your quest progress saves on this device.</p>
+        </div>
+        <div class="cardlet">
+          <div class="doodle">XP path</div>
+          <h2>Quest XP</h2>
+          <div class="xp-row">
+            <span class="pill">XP: <span class="mono" id="xp">0</span></span>
+            <span class="pill">Checks: <span class="mono" id="checks-done">0</span>/<span class="mono" id="checks-total">0</span></span>
+            <span class="pill">Rank: <span id="rank">Notebook Scout</span></span>
+          </div>
+          <div class="meter"><div class="meter-fill" id="xp-bar"></div></div>
+          <p class="tiny" id="xp-note" style="margin-top:10px">Complete a few missions to unlock your next rank.</p>
+        </div>
+        <div class="cardlet">
+          <div class="doodle">win plan</div>
+          <h2>How To Win Today</h2>
+          <p class="note">1. Read the power note.</p>
+          <p class="note">2. Check off the mini missions.</p>
+          <p class="note">3. Finish the teach-back final boss with a parent.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Mission Board</h2>
+      <p class="tiny">Each check is worth <strong>10 XP</strong>. The final boss check is worth <strong>20 XP</strong>.</p>
+
+      <div class="mission-grid">
+        <article class="mission">
+          <div class="doodle">grammar glow</div>
+          <h3>Grammar Glow-Up</h3>
+          <div class="power-note">
+            <h3>Power Note</h3>
+            <p><strong>FANBOYS fix:</strong> if two complete sentences join with <span class="mono">for, and, nor, but, or, yet, so</span>, they usually need a comma.</p>
+            <p><strong>Upgrade trick:</strong> swap a plain verb like <em>went</em> for a vivid verb like <em>raced</em> or <em>tiptoed</em>.</p>
+          </div>
+          <ul class="checks">
+            <li class="check"><input data-xp="10" id="v-grammar-1" type="checkbox" /><label for="v-grammar-1"><strong>Fix it:</strong> Rewrite one run-on sentence with a comma and a FANBOYS word.</label></li>
+            <li class="check"><input data-xp="10" id="v-grammar-2" type="checkbox" /><label for="v-grammar-2"><strong>Shine it up:</strong> Change one boring verb into a stronger action word.</label></li>
+          </ul>
+        </article>
+
+        <article class="mission">
+          <div class="doodle">detective hat</div>
+          <h3>Reading Detective</h3>
+          <div class="power-note">
+            <h3>Power Note</h3>
+            <p><strong>Main idea:</strong> what the whole section is mostly about.</p>
+            <p><strong>Proof:</strong> quote or point to one clue from the text that supports your answer.</p>
+          </div>
+          <ul class="checks">
+            <li class="check"><input data-xp="10" id="v-reading-1" type="checkbox" /><label for="v-reading-1"><strong>Stop and summarize:</strong> After one paragraph, say the main idea in one sentence.</label></li>
+            <li class="check"><input data-xp="10" id="v-reading-2" type="checkbox" /><label for="v-reading-2"><strong>Evidence grab:</strong> Find one word or line that proves your answer.</label></li>
+          </ul>
+        </article>
+
+        <article class="mission">
+          <div class="doodle">math sparkle</div>
+          <h3>Math Mission</h3>
+          <div class="power-note">
+            <h3>Power Note</h3>
+            <p><strong>Estimate first:</strong> make a quick guess before solving.</p>
+            <p><strong>Fraction shortcut:</strong> if denominators match, the bigger numerator makes the bigger fraction.</p>
+          </div>
+          <ul class="checks">
+            <li class="check"><input data-xp="10" id="v-math-1" type="checkbox" /><label for="v-math-1"><strong>Estimate then solve:</strong> Do one problem by guessing first, then checking the real answer.</label></li>
+            <li class="check"><input data-xp="10" id="v-math-2" type="checkbox" /><label for="v-math-2"><strong>Fraction face-off:</strong> Compare two same-denominator fractions and explain why one is larger.</label></li>
+          </ul>
+        </article>
+
+        <article class="mission">
+          <div class="doodle">media radar</div>
+          <h3>Media Literacy Radar</h3>
+          <div class="power-note">
+            <h3>Power Note</h3>
+            <p>Ask three fast questions: <strong>Who made it?</strong> <strong>What do they want me to think or do?</strong> <strong>What proof did they give?</strong></p>
+          </div>
+          <ul class="checks">
+            <li class="check"><input data-xp="10" id="v-media-1" type="checkbox" /><label for="v-media-1"><strong>Spot the goal:</strong> Tell whether a message is trying to teach, sell, or persuade.</label></li>
+            <li class="check"><input data-xp="10" id="v-media-2" type="checkbox" /><label for="v-media-2"><strong>Proof check:</strong> Name one fact, picture, or missing clue that would make the message stronger.</label></li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="boss-box">
+        <h2>Final Boss: Teach It Back</h2>
+        <p class="note">Explain one thing you learned from <strong>grammar</strong>, <strong>reading</strong>, <strong>math</strong>, and <strong>media literacy</strong>. If you can teach it clearly, you really know it.</p>
+        <textarea id="boss-notes" placeholder="Write or dictate your best teach-back notes here..."></textarea>
+        <ul class="checks">
+          <li class="check"><input data-xp="20" id="v-boss-1" type="checkbox" /><label for="v-boss-1"><strong>Boss clear:</strong> I taught back all four subjects to a parent or helper.</label></li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="footer">Princess power notes + bright missions + one brave final boss</div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'victoria.notebookQuest.v1';
+    const XP_RANKS = [
+      { xp: 0, label: 'Notebook Scout' },
+      { xp: 30, label: 'Highlight Hero' },
+      { xp: 60, label: 'Power-Note Princess' },
+      { xp: 90, label: 'Final Boss Scholar' },
+    ];
+
+    const els = {
+      name: document.getElementById('player-name'),
+      welcome: document.getElementById('welcome'),
+      xp: document.getElementById('xp'),
+      checksDone: document.getElementById('checks-done'),
+      checksTotal: document.getElementById('checks-total'),
+      rank: document.getElementById('rank'),
+      xpBar: document.getElementById('xp-bar'),
+      xpNote: document.getElementById('xp-note'),
+      bossNotes: document.getElementById('boss-notes'),
+      checks: Array.from(document.querySelectorAll('input[type="checkbox"][data-xp]')),
+    };
+
+    const state = {
+      name: '',
+      bossNotes: '',
+      checks: {},
+    };
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        if (saved && typeof saved === 'object') {
+          state.name = saved.name || '';
+          state.bossNotes = saved.bossNotes || '';
+          state.checks = saved.checks || {};
+        }
+      } catch {}
+    }
+
+    function save() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch {}
+    }
+
+    function currentXp() {
+      return els.checks.reduce((sum, check) => sum + (check.checked ? Number(check.dataset.xp || 0) : 0), 0);
+    }
+
+    function currentRank(xp) {
+      let rank = XP_RANKS[0];
+      for (const item of XP_RANKS) {
+        if (xp >= item.xp) rank = item;
+      }
+      return rank;
+    }
+
+    function nextRank(xp) {
+      for (const item of XP_RANKS) {
+        if (item.xp > xp) return item;
+      }
+      return null;
+    }
+
+    function render() {
+      const xp = currentXp();
+      const done = els.checks.filter((check) => check.checked).length;
+      const total = els.checks.length;
+      const rank = currentRank(xp);
+      const next = nextRank(xp);
+      const learner = state.name.trim() || 'bright learner';
+
+      els.name.value = state.name;
+      els.bossNotes.value = state.bossNotes;
+      els.welcome.textContent = `Welcome, ${learner}. Your notebook progress stays saved on this device.`;
+      els.xp.textContent = String(xp);
+      els.checksDone.textContent = String(done);
+      els.checksTotal.textContent = String(total);
+      els.rank.textContent = rank.label;
+
+      if (next) {
+        const prevXp = rank.xp;
+        const span = next.xp - prevXp;
+        const progress = xp - prevXp;
+        els.xpBar.style.width = `${Math.max(8, Math.min(100, (progress / span) * 100))}%`;
+        els.xpNote.textContent = `${next.xp - xp} more XP unlocks ${next.label}.`;
+      } else {
+        els.xpBar.style.width = '100%';
+        els.xpNote.textContent = 'Max notebook rank reached. Keep replaying the missions for fluency.';
+      }
+    }
+
+    for (const check of els.checks) {
+      check.addEventListener('change', () => {
+        state.checks[check.id] = check.checked;
+        save();
+        render();
+      });
+    }
+
+    els.name.addEventListener('input', (event) => {
+      state.name = String(event.target.value || '').trimStart();
+      save();
+      render();
+    });
+
+    els.bossNotes.addEventListener('input', (event) => {
+      state.bossNotes = String(event.target.value || '');
+      save();
+    });
+
+    load();
+    for (const check of els.checks) {
+      check.checked = !!state.checks[check.id];
+    }
+    render();
+  </script>
+</body>
+</html>
