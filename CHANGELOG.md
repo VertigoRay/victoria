@@ -8,3 +8,7 @@
 # 2026-08-16
 
 - Added a spoiler-free Narnia reading quest for the required 3rd-grade novel, with the confirmed edition, due date, vocabulary, checklist, and locally saved prediction.
+
+# 2026-09-02
+
+- Fixed reading-quest save confirmation by selecting its status element explicitly; successful saves now display and announce Saved!.
