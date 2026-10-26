@@ -222,7 +222,9 @@
           <h2>Notebook Owner</h2>
           <label class="tiny" for="player-name">Name on the cover</label>
           <input class="name-input" id="player-name" maxlength="28" placeholder="Type your name" />
-          <p class="tiny" id="welcome" style="margin-top:10px">Your quest progress saves on this device.</p>
+          <p class="tiny" id="welcome" style="margin-top:10px">Welcome to your notebook quest.</p>
+          <p class="tiny" id="save-status" role="status" aria-live="polite">Saving is not active yet. Keep this page open to keep your work.</p>
+          <button class="pill" id="retry-save" type="button" hidden>Try saving again</button>
         </div>
         <div class="cardlet">
           <div class="doodle">XP path</div>
@@ -331,6 +333,8 @@
     const els = {
       name: document.getElementById('player-name'),
       welcome: document.getElementById('welcome'),
+      saveStatus: document.getElementById('save-status'),
+      retrySave: document.getElementById('retry-save'),
       xp: document.getElementById('xp'),
       checksDone: document.getElementById('checks-done'),
       checksTotal: document.getElementById('checks-total'),
@@ -347,6 +351,8 @@
       checks: {},
     };
 
+    let storageStatus = 'fresh';
+
     function load() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -356,14 +362,33 @@
           state.name = saved.name || '';
           state.bossNotes = saved.bossNotes || '';
           state.checks = saved.checks || {};
+          storageStatus = 'loaded';
         }
-      } catch {}
+      } catch {
+        storageStatus = 'load-error';
+      }
     }
 
     function save() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch {}
+        storageStatus = 'saved';
+      } catch {
+        storageStatus = 'save-error';
+      }
+      renderSaveStatus();
+    }
+
+    function renderSaveStatus() {
+      const messages = {
+        fresh: 'Make a change to try saving in this browser on this device.',
+        loaded: 'Progress loaded from this browser on this device.',
+        saved: 'Progress saved in this browser on this device.',
+        'load-error': 'Saved progress could not be loaded. Keep this page open and copy any notes before leaving.',
+        'save-error': 'Not saved. Keep this page open and copy your notes before leaving. You can try saving again.',
+      };
+      els.saveStatus.textContent = messages[storageStatus];
+      els.retrySave.hidden = storageStatus !== 'save-error';
     }
 
     function currentXp() {
@@ -395,7 +420,8 @@
 
       els.name.value = state.name;
       els.bossNotes.value = state.bossNotes;
-      els.welcome.textContent = `Welcome, ${learner}. Your notebook progress stays saved on this device.`;
+      els.welcome.textContent = `Welcome, ${learner}.`;
+      renderSaveStatus();
       els.xp.textContent = String(xp);
       els.checksDone.textContent = String(done);
       els.checksTotal.textContent = String(total);
@@ -431,6 +457,8 @@
       state.bossNotes = String(event.target.value || '');
       save();
     });
+
+    els.retrySave.addEventListener('click', save);
 
     load();
     for (const check of els.checks) {
